@@ -58,4 +58,12 @@ export const FIGMA = {
     "https://resource.logitechg.com/w_692,c_lpad,ar_16:9,q_auto,f_auto,dpr_1.0/d_transparent.gif/content/dam/gaming/en/products/pro-x-tkl/gallery/pro-x-tkl-pink-gallery-1.png?v=1",
   productKeyboard1:
     "https://resource.logitechg.com/w_692,c_lpad,ar_16:9,q_auto,f_auto,dpr_1.0/d_transparent.gif/content/dam/gaming/en/products/pro-keyboard/pro-clicky-keyboard-gallery-1.png?v=1",
+    keyboardPink: "/images/keyboard-pink.png",
+keyboardBlack: "/images/keyboard-black.png",
+keyboardRgb: "/images/keyboard-rgb.png",
+productHeadsetPink: "/images/headset-pink.png",
+productHeadsetPinkSide: "/images/headset-pink-side.png",
+productHeadsetPinkBox: "/images/headset-pink-box.png",
+productHeadsetPinkModel: "/images/headset-pink-model.png",
+
 };
