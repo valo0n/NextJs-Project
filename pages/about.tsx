@@ -1,4 +1,3 @@
-
 import Layout from "@/components/Layout";
 import Head from "next/head";
 import Link from "next/link";
@@ -9,22 +8,9 @@ function ReadMoreButton({ href = "/" }: { href?: string }) {
   return (
     <Link
       href={href}
-      className="inline-flex items-center gap-2 text-white hover:text-[#cf35d2] transition"
+      className="text-white underline-offset-4 underline hover:text-[#cf35d2] transition text-sm"
     >
-      <span>Read more</span>
-      <svg
-        className="w-4 h-4"
-        fill="none"
-        stroke="currentColor"
-        viewBox="0 0 24 24"
-      >
-        <path
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          strokeWidth={2}
-          d="M14 5l7 7m0 0l-7 7m7-7H3"
-        />
-      </svg>
+      Read more
     </Link>
   );
 }
@@ -34,67 +20,72 @@ const About: NextPage = () => {
     <>
       <Head>
         <title>About Us - Paradox Tech</title>
-        <meta
-          name="description"
-          content="Learn more about Paradox Tech"
-        />
+        <meta name="description" content="Learn more about Paradox Tech" />
       </Head>
 
       <Layout>
-        {/* HERO */}
-        <section className="relative pt-32 pb-20 overflow-hidden">
-          {/* Glow Background */}
-          <div className="absolute top-[-20%] left-[-10%] w-[500px] h-[500px] rounded-full bg-blue-500/20 blur-[120px]" />
-          <div className="absolute top-[10%] right-[-10%] w-[400px] h-[400px] rounded-full bg-[#cf35d2]/20 blur-[120px]" />
+        {/* HERO BANNER - "About us" me 2 ilustrime */}
+        <section className="relative pt-32 pb-16 px-6 overflow-hidden">
+          {/* Glow blue ne sfond lart */}
+          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[400px] rounded-full bg-blue-500/25 blur-[150px] pointer-events-none" />
 
-          <div className="max-w-7xl mx-auto px-6 relative z-10">
-            {/* About Banner */}
-            <div className="relative bg-gradient-to-r from-[#e7e4f5] to-[#d5d2e9] rounded-[35px] overflow-hidden min-h-[320px] flex items-center justify-center">
-              {/* Left Image */}
+          <div className="max-w-7xl mx-auto relative z-10">
+            {/* Banner me sfond te qelte gradient */}
+            <div
+              className="relative rounded-[35px] overflow-hidden min-h-[280px] sm:min-h-[340px] flex items-center justify-center px-6 py-8"
+              style={{
+                background:
+                  "linear-gradient(135deg, #d8d4e8 0%, #c9c5dc 50%, #b9b5d0 100%)",
+              }}
+            >
+              {/* Left illustration - 3D laptop */}
               <img
                 src={FIGMA.aboutLeft}
-                alt="About illustration"
-                className="absolute left-0 bottom-0 w-44 lg:w-64 object-contain"
+                alt="Laptop illustration"
+                className="absolute left-2 sm:left-6 bottom-2 sm:bottom-6 w-32 sm:w-48 lg:w-64 object-contain z-10 pointer-events-none"
               />
 
-              {/* Right Image */}
+              {/* Right illustration - 3D shopping cart */}
               <img
                 src={FIGMA.aboutRight}
                 alt="Shopping illustration"
-                className="absolute right-0 bottom-0 w-52 lg:w-72 object-contain"
+                className="absolute right-2 sm:right-6 bottom-2 sm:bottom-6 w-32 sm:w-48 lg:w-72 object-contain z-10 pointer-events-none"
               />
 
-              <h1 className="text-4xl lg:text-6xl font-bold text-[#333] z-10">
+              {/* Centered title */}
+              <h1 className="text-4xl sm:text-5xl lg:text-7xl font-bold text-[#3a3a3a] z-20 relative">
                 About us
               </h1>
             </div>
           </div>
         </section>
 
-        {/* FEATURES */}
-        <section className="pb-20 px-6">
-          <div className="max-w-7xl mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 text-white">
+        {/* FEATURES - 4 columns */}
+        <section className="py-12 sm:py-16 px-6">
+          <div className="max-w-7xl mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-12 text-white text-center">
             {[
               {
-                title: "Shop online",
-                desc: "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
+                title: "Shope online",
+                desc: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Consequat dolor odio odio",
               },
               {
                 title: "Free shipping",
-                desc: "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
+                desc: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Consequat dolor odio odio",
               },
               {
                 title: "Return policy",
-                desc: "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
+                desc: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Consequat dolor odio odio",
               },
               {
-                title: "Payment",
-                desc: "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
+                title: "PAYMENT",
+                desc: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Consequat dolor odio odio",
               },
             ].map((item, index) => (
               <div key={index}>
-                <h3 className="font-bold text-lg mb-3">{item.title}</h3>
-                <p className="text-gray-300 text-sm leading-relaxed">
+                <h3 className="font-bold text-xl lg:text-2xl mb-4">
+                  {item.title}
+                </h3>
+                <p className="text-gray-300 text-sm lg:text-base leading-relaxed">
                   {item.desc}
                 </p>
               </div>
@@ -102,20 +93,27 @@ const About: NextPage = () => {
           </div>
         </section>
 
-        {/* VIDEO SECTION */}
-        <section className="relative h-[450px] overflow-hidden">
+        {/* VIDEO SECTION - 3D app icons background */}
+        <section className="relative h-64 sm:h-96 lg:h-[450px] overflow-hidden">
           <img
-            src={FIGMA.videoBg}
+            src={FIGMA.aboutVideoBg}
             alt="Video section"
             className="absolute inset-0 w-full h-full object-cover"
           />
-
-          <div className="absolute inset-0 bg-black/30" />
+          <div className="absolute inset-0 bg-black/40" />
 
           <div className="relative z-10 h-full flex items-center justify-center">
-            <button className="w-20 h-20 rounded-full bg-[#cf35d2]/80 hover:bg-[#cf35d2] transition flex items-center justify-center shadow-2xl shadow-[#cf35d2]/50">
+            <button
+              className="w-16 h-16 sm:w-20 sm:h-20 rounded-full flex items-center justify-center transition shadow-2xl backdrop-blur-md hover:scale-110"
+              style={{
+                background:
+                  "linear-gradient(135deg, rgba(207, 53, 210, 0.7), rgba(63, 50, 220, 0.7))",
+                boxShadow: "0 0 40px rgba(207, 53, 210, 0.5)",
+              }}
+              aria-label="Play video"
+            >
               <svg
-                className="w-8 h-8 text-white ml-1"
+                className="w-7 h-7 sm:w-9 sm:h-9 text-white ml-1"
                 fill="currentColor"
                 viewBox="0 0 24 24"
               >
@@ -125,53 +123,47 @@ const About: NextPage = () => {
           </div>
         </section>
 
-        {/* SKILLS SECTION */}
-        <section className="py-24 px-6 bg-[#0c0f24]">
-          <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-16 items-start">
-            {/* Left */}
+        {/* FUNCTIONALITY MEETS PERFECTION - text + skill bars */}
+        <section className="py-16 sm:py-24 px-6">
+          <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 items-start">
+            {/* Left - title + paragraph */}
             <div>
-              <h2 className="text-4xl lg:text-5xl font-bold text-white mb-6">
+              <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-white mb-6 leading-tight">
                 Functionality
                 <br />
                 meets perfection
               </h2>
 
-              <p className="text-gray-300 leading-relaxed max-w-lg">
+              <p className="text-gray-300 leading-relaxed max-w-lg text-base lg:text-lg">
                 Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-                Suspendisse massa libero, mattis volutpat id. Egestas
-                adipiscing placerat eleifend a nascetur.
+                Suspendisse massa libero, mattis volutpat id. Egestas adipiscing
+                placerat eleifend a nascetur. Mattis proin enim, nam porttitor
+                vitae.
               </p>
             </div>
 
-            {/* Right */}
+            {/* Right - skill bars */}
             <div className="space-y-10">
               {[
-                {
-                  title: "Creativity",
-                  percent: "94%",
-                  width: "94%",
-                },
-                {
-                  title: "Advertising",
-                  percent: "72%",
-                  width: "72%",
-                },
-                {
-                  title: "Design",
-                  percent: "84%",
-                  width: "84%",
-                },
+                { title: "Creativity", percent: 94 },
+                { title: "Advertising", percent: 72 },
+                { title: "Design", percent: 84 },
               ].map((item, index) => (
                 <div key={index}>
-                  <div className="flex items-center justify-between mb-3 text-white">
+                  <div className="flex items-center justify-between mb-3 text-white text-lg">
                     <span>{item.title}</span>
-                    <span>{item.percent}</span>
+                    <span>{item.percent} %</span>
                   </div>
 
-                  <div className="w-full h-[3px] bg-gray-700 rounded-full overflow-hidden">
+                  {/* Progress bar - gradient yellow → red → green */}
+                  <div className="relative w-full h-[3px] bg-gray-700/40 overflow-hidden rounded-full">
                     <div
-                      className="h-full bg-gradient-to-r from-[#cf35d2] to-blue-500"
-                      style={{ width: item.width }}
+                      className="absolute top-0 left-0 h-full rounded-full"
+                      style={{
+                        width: `${item.percent}%`,
+                        background:
+                          "linear-gradient(90deg, #facc15 0%, #ef4444 50%, #22c55e 100%)",
+                      }}
                     />
                   </div>
                 </div>
@@ -180,43 +172,47 @@ const About: NextPage = () => {
           </div>
         </section>
 
-        {/* BLOG POSTS */}
-        <section className="py-24 px-6">
+        {/* LAST BLOG POST - 3 laptopa */}
+        <section className="py-16 sm:py-20 px-6 pb-32">
           <div className="max-w-7xl mx-auto">
-            <h2 className="text-3xl font-bold text-white mb-14">
+            <h2 className="text-2xl sm:text-3xl font-bold text-white mb-12 lg:mb-16">
               Last blog post
             </h2>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 lg:gap-12">
               {[
                 {
-                  image: FIGMA.blog1,
+                  image: FIGMA.laptopRazer,
                   title: "Razer Blade 14 Gaming Laptop",
+                  desc: "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
                 },
                 {
-                  image: FIGMA.blog2,
-                  title: "ASUS Zenbook 15 OLED",
+                  image: FIGMA.laptopAsus,
+                  title: 'ASUS Zenbook 15 OLED 15.6" Laptop',
+                  desc: "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
                 },
                 {
-                  image: FIGMA.blog3,
+                  image: FIGMA.laptopAcer,
                   title: "Nitro 5 Gaming Laptop",
+                  desc: "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
                 },
               ].map((post, index) => (
-                <div key={index} className="group text-center">
-                  <div className="overflow-hidden mb-6 bg-white p-4">
+                <div key={index} className="text-center group">
+                  {/* Image me sfond te bardhe si ne Figma */}
+                  <div className="bg-white overflow-hidden mb-6">
                     <img
                       src={post.image}
                       alt={post.title}
-                      className="w-full h-[250px] object-cover group-hover:scale-105 transition duration-500"
+                      className="w-full h-[200px] sm:h-[250px] object-contain p-4 group-hover:scale-105 transition-transform duration-500"
                     />
                   </div>
 
-                  <h3 className="text-white text-lg font-semibold mb-3">
+                  <h3 className="text-white text-base lg:text-lg font-medium mb-3 px-2">
                     {post.title}
                   </h3>
 
-                  <p className="text-gray-400 text-sm mb-6">
-                    Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+                  <p className="text-gray-400 text-sm mb-4 px-4 leading-relaxed">
+                    {post.desc}
                   </p>
 
                   <ReadMoreButton />

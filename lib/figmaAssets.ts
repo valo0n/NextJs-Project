@@ -1,33 +1,61 @@
+// Imazhet per gjithe projektin - URL publike qe nuk skadojne
+
 export const FIGMA = {
-  // Logo
+  // Logo - SVG inline ose lokal
+  // SHENIM: Per logo origjinale, shkarkoje nga Figma dhe vendose ne /public/logo.png
+  // Pastaj ndryshoje ne: logo: "/logo.png",
   logo: "https://www.figma.com/api/mcp/asset/ed3394cd-3d7c-47f9-8ffb-b0ca594b6e54",
 
-  // Hero
-  giveShop: "https://www.figma.com/api/mcp/asset/942998e7-8487-4fa9-bbff-ea1bcbc21824",
+  // Hero - shopping bag with hand (illustration)
+  giveShop: "https://img.icons8.com/3d-fluency/375/shopping-bag.png",
 
-  // Products
-  productMouse: "https://www.figma.com/api/mcp/asset/2c1b7497-e99b-4b82-9170-20be8d8b9c64",
-  productHeadset: "https://www.figma.com/api/mcp/asset/a5085fde-601c-48e0-b20f-bcb9c22c4256",
-  productController: "https://www.figma.com/api/mcp/asset/b24c3410-d27c-41a1-aaf4-c5c2b7317f0a",
+  // Products of the week (Home)
+  // Logitech CDN (gjithmone funksionon)
+  productMouse:
+    "https://resource.logitech.com/w_692,c_lpad,ar_4:3,q_auto,f_auto,dpr_2.0/d_transparent.gif/content/dam/logitech/en/products/mice/g-pro-x-superlight-wireless-gaming-mouse/g-pro-x-superlight-gallery-white-1.png?v=1",
+  productHeadset:
+    "https://resource.logitechg.com/w_692,c_lpad,ar_16:9,q_auto,f_auto,dpr_1.0/d_transparent.gif/content/dam/gaming/en/products/pro-x-2/g-pro-x2-lightspeed-gallery-1.png?v=1",
+  productController:
+    "https://images.unsplash.com/photo-1592840496694-26d035b52b48?w=600&h=600&fit=crop&q=80",
 
-  // Video
-  videoBg: "https://www.figma.com/api/mcp/asset/6e3c5265-c77a-42ef-9f70-342d0c390e47",
+  // Video background (studio setup)
+  videoBg:
+    "https://images.unsplash.com/photo-1542751371-adc38448a05e?w=1600&h=600&fit=crop&q=80",
 
-  // Furniture
-  chair: "https://www.figma.com/api/mcp/asset/a4606d61-58f9-4feb-8146-4a7816224f2e",
-  table: "https://www.figma.com/api/mcp/asset/2ea5b778-febb-45b3-a66f-23f6fb606ff0",
-  lamp: "https://www.figma.com/api/mcp/asset/91c16023-d859-4a12-a3b5-1c99ef366494",
+  // Furniture - chair, table, lamp
+  chair:
+    "https://images.unsplash.com/photo-1610395219791-21b0353e43c4?w=800&h=800&fit=crop&q=80",
+  table:
+    "https://images.unsplash.com/photo-1593640408182-31c70c8268f5?w=800&h=800&fit=crop&q=80",
+  lamp: "https://images.unsplash.com/photo-1507473885765-e6ed057f782c?w=800&h=800&fit=crop&q=80",
 
-  // CTA
-  person1: "https://www.figma.com/api/mcp/asset/ac66c209-3ff7-4d59-b570-a2ceda1953f6",
-  person2: "https://www.figma.com/api/mcp/asset/37de6179-877d-499d-94dd-cc2d6fbd488c",
+  // CTA persons - Home "Another Level"
+  person1:
+    "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=600&h=800&fit=crop&q=80",
+  person2:
+    "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=600&h=800&fit=crop&q=80",
 
-  // About page
-  aboutLeft: "/images/about-left.png",
-  aboutRight: "/images/about-right.png",
+  // About page - 3D laptop + 3D shopping cart illustrations
+  aboutLeft: "https://img.icons8.com/3d-fluency/375/laptop.png",
+  aboutRight: "https://img.icons8.com/3d-fluency/375/shopping-cart.png",
+  aboutVideoBg:
+    "https://images.unsplash.com/photo-1611162617474-5b21e879e113?w=1600&h=600&fit=crop&q=80",
 
-  // Blog
-  blog1: "/images/blog1.png",
-  blog2: "/images/blog2.png",
-  blog3: "/images/blog3.png",
+  // About - Last blog post (laptopa)
+  laptopRazer:
+    "https://images.unsplash.com/photo-1603302576837-37561b2e2302?w=800&h=600&fit=crop&q=80",
+  laptopAsus:
+    "https://images.unsplash.com/photo-1496181133206-80ce9b88a853?w=800&h=600&fit=crop&q=80",
+  laptopAcer:
+    "https://images.unsplash.com/photo-1593642632559-0c6d3fc62b89?w=800&h=600&fit=crop&q=80",
+
+  // Blog page - keyboards (Logitech CDN)
+  blog1:
+    "https://resource.logitechg.com/w_692,c_lpad,ar_16:9,q_auto,f_auto,dpr_1.0/d_transparent.gif/content/dam/gaming/en/products/pro-keyboard/pro-clicky-keyboard-gallery-1.png?v=1",
+  blog2:
+    "https://resource.logitechg.com/w_692,c_lpad,ar_16:9,q_auto,f_auto,dpr_1.0/d_transparent.gif/content/dam/gaming/en/products/pro-x-tkl/gallery/pro-x-tkl-black-gallery-1.png?v=1",
+  blog3:
+    "https://resource.logitechg.com/w_692,c_lpad,ar_16:9,q_auto,f_auto,dpr_1.0/d_transparent.gif/content/dam/gaming/en/products/pro-x-tkl/gallery/pro-x-tkl-pink-gallery-1.png?v=1",
+  productKeyboard1:
+    "https://resource.logitechg.com/w_692,c_lpad,ar_16:9,q_auto,f_auto,dpr_1.0/d_transparent.gif/content/dam/gaming/en/products/pro-keyboard/pro-clicky-keyboard-gallery-1.png?v=1",
 };
