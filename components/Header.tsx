@@ -25,7 +25,7 @@ export default function Header() {
             </Link>
           </li>
           <li>
-            <Link href="/eshop" className="hover:text-paradox-glow transition">
+            <Link href="/shop" className="hover:text-paradox-glow transition">
               E-shop
             </Link>
           </li>
@@ -41,7 +41,7 @@ export default function Header() {
           </li>
         </ul>
 
-        {/* Right side: Search + Login (Account) + Cart + Mobile menu */}
+        {/* Right side: Search + Login + Cart + Mobile menu */}
         <div className="flex items-center gap-3 sm:gap-5">
           {/* Search */}
           <button
@@ -152,7 +152,7 @@ export default function Header() {
             </li>
             <li>
               <Link
-                href="/eshop"
+                href="/shop"
                 onClick={() => setOpen(false)}
                 className="block py-2 hover:text-paradox-glow"
               >
@@ -184,6 +184,15 @@ export default function Header() {
                 className="block py-2 text-paradox-glow"
               >
                 Login / Account
+              </Link>
+            </li>
+            <li>
+              <Link
+                href="/cart"
+                onClick={() => setOpen(false)}
+                className="block py-2 hover:text-paradox-glow"
+              >
+                Cart
               </Link>
             </li>
           </ul>

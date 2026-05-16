@@ -5,15 +5,25 @@ import { NextPage } from "next";
 import { FIGMA } from "@/lib/figmaAssets";
 
 // Buton "View more" sipas dizajnit (border simple)
-function ViewMoreButton({ href = "/" }: { href?: string }) {
+function ViewMoreButton({ href = "/shop" }: { href?: string }) {
   return (
     <Link
       href={href}
       className="inline-flex items-center justify-center gap-3 border border-[#ececec] text-[#ececec] px-12 py-5 text-lg hover:bg-white hover:text-paradox-bg transition-all duration-300"
     >
       <span>View more</span>
-      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
+      <svg
+        className="w-5 h-5"
+        fill="none"
+        stroke="currentColor"
+        viewBox="0 0 24 24"
+      >
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth={2}
+          d="M14 5l7 7m0 0l-7 7m7-7H3"
+        />
       </svg>
     </Link>
   );
@@ -61,11 +71,12 @@ const Home: NextPage = () => {
                   Empowering Your Digital Lifestyle
                 </h1>
                 <p className="text-gray-300 max-w-xl mx-auto mb-10 text-base sm:text-lg leading-relaxed">
-                  Lorem ipsum dolor sit amet, consectetur adipiscing elit. Consequat dolor odio odio
-                  malesuada at condimentum adipiscing iaculis semper.
+                  Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+                  Consequat dolor odio odio malesuada at condimentum adipiscing
+                  iaculis semper.
                 </p>
 
-                <ViewMoreButton href="/" />
+                <ViewMoreButton href="/shop" />
               </div>
             </div>
           </div>
@@ -79,8 +90,9 @@ const Home: NextPage = () => {
                 Products of the Week
               </h2>
               <p className="text-[#ddd] max-w-3xl mx-auto text-base lg:text-lg">
-                Lorem ipsum dolor sit amet, consectetur adipiscing elit. Consequat dolor odio odio
-                malesuada at condimentum adipiscing iaculis semper.
+                Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+                Consequat dolor odio odio malesuada at condimentum adipiscing
+                iaculis semper.
               </p>
             </div>
 
@@ -139,8 +151,9 @@ const Home: NextPage = () => {
 
             <div className="text-center">
               <p className="text-[#ececec] max-w-2xl mx-auto mb-8 text-base lg:text-lg">
-                Lorem ipsum dolor sit amet, consectetur adipiscing elit. Consequat dolor odio odio
-                malesuada at condimentum adipiscing iaculis semper.
+                Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+                Consequat dolor odio odio malesuada at condimentum adipiscing
+                iaculis semper.
               </p>
               <ViewMoreButton />
             </div>
@@ -160,7 +173,11 @@ const Home: NextPage = () => {
               className="w-16 h-16 sm:w-20 sm:h-20 lg:w-24 lg:h-24 rounded-full bg-paradox-purple/80 hover:bg-paradox-purple flex items-center justify-center transition shadow-2xl shadow-paradox-purple/50"
               aria-label="Play video"
             >
-              <svg className="w-6 h-6 sm:w-8 sm:h-8 text-white ml-1" fill="currentColor" viewBox="0 0 24 24">
+              <svg
+                className="w-6 h-6 sm:w-8 sm:h-8 text-white ml-1"
+                fill="currentColor"
+                viewBox="0 0 24 24"
+              >
                 <path d="M8 5v14l11-7z" />
               </svg>
             </button>
@@ -177,8 +194,9 @@ const Home: NextPage = () => {
                 stylish chairs
               </h2>
               <p className="text-[#ececec] mb-8 leading-relaxed text-base lg:text-lg max-w-md">
-                Lorem ipsum dolor sit amet, consectetur adipiscing elit. Consequat dolor odio odio
-                malesuada at condimentum adipiscing iaculis semper.
+                Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+                Consequat dolor odio odio malesuada at condimentum adipiscing
+                iaculis semper.
               </p>
               <ViewMoreButton />
             </div>
@@ -214,8 +232,9 @@ const Home: NextPage = () => {
                 Table
               </h2>
               <p className="text-[#ececec] mb-8 leading-relaxed text-base lg:text-lg max-w-md mx-auto lg:mx-0">
-                Lorem ipsum dolor sit amet, consectetur adipiscing elit. Consequat dolor odio odio
-                malesuada at condimentum adipiscing iaculis semper.
+                Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+                Consequat dolor odio odio malesuada at condimentum adipiscing
+                iaculis semper.
               </p>
               <ViewMoreButton />
             </div>
@@ -232,8 +251,9 @@ const Home: NextPage = () => {
                 contemporary lamps
               </h2>
               <p className="text-[#ececec] mb-8 leading-relaxed text-base lg:text-lg max-w-md">
-                Lorem ipsum dolor sit amet, consectetur adipiscing elit. Consequat dolor odio odio
-                malesuada at condimentum adipiscing iaculis semper.
+                Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+                Consequat dolor odio odio malesuada at condimentum adipiscing
+                iaculis semper.
               </p>
               <ViewMoreButton />
             </div>
@@ -253,7 +273,8 @@ const Home: NextPage = () => {
         <section className="py-12 lg:py-16 bg-[#0f0f0f]">
           <div className="max-w-7xl mx-auto px-6 text-center">
             <p className="text-xl sm:text-2xl lg:text-3xl text-[#ececec]">
-              Order now for an <span className="font-bold">express delivery in 24h !</span>
+              Order now for an{" "}
+              <span className="font-bold">express delivery in 24h !</span>
             </p>
           </div>
         </section>
@@ -281,13 +302,15 @@ const Home: NextPage = () => {
               <h2
                 className="text-4xl sm:text-5xl lg:text-7xl font-bold mb-6 uppercase bg-clip-text text-transparent"
                 style={{
-                  backgroundImage: "linear-gradient(65deg, rgb(63, 50, 220) 0%, rgb(207, 53, 210) 100%)",
+                  backgroundImage:
+                    "linear-gradient(65deg, rgb(63, 50, 220) 0%, rgb(207, 53, 210) 100%)",
                 }}
               >
-                Another Level!
+                Another Level!  
               </h2>
               <p className="text-[#ececec] text-base sm:text-lg lg:text-2xl leading-relaxed">
-                Enter here an impactful phrase that describes who you are, what you do, and the results you bring
+                Enter here an impactful phrase that describes who you are, what
+                you do, and the results you bring
               </p>
             </div>
 
@@ -296,7 +319,8 @@ const Home: NextPage = () => {
               <div
                 className="relative rounded-tl-[60px] rounded-tr-[60px] rounded-bl-[60px] overflow-hidden aspect-[3/4]"
                 style={{
-                  background: "linear-gradient(259deg, rgb(207, 53, 210) 3.788%, rgb(63, 50, 220) 165.84%)",
+                  background:
+                    "linear-gradient(259deg, rgb(207, 53, 210) 3.788%, rgb(63, 50, 220) 165.84%)",
                 }}
               >
                 <img
@@ -308,7 +332,8 @@ const Home: NextPage = () => {
               <div
                 className="relative rounded-tl-[60px] rounded-tr-[60px] rounded-bl-[60px] overflow-hidden aspect-[3/4] mt-12"
                 style={{
-                  background: "linear-gradient(259deg, rgb(207, 53, 210) 3.788%, rgb(63, 50, 220) 165.84%)",
+                  background:
+                    "linear-gradient(259deg, rgb(207, 53, 210) 3.788%, rgb(63, 50, 220) 165.84%)",
                 }}
               >
                 <img
