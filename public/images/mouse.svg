@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400">
+  <rect width="400" height="400" fill="#f5f5f7"/>
+  <!-- Mouse body -->
+  <path d="M200 80 Q280 80, 290 180 L290 280 Q290 340, 200 340 Q110 340, 110 280 L110 180 Q120 80, 200 80 Z" fill="#2a2a2a"/>
+  <path d="M200 90 Q275 90, 280 180 L280 270 Q280 325, 200 325 Q120 325, 120 270 L120 180 Q125 90, 200 90 Z" fill="#1a1a1a"/>
+  <!-- Center line -->
+  <line x1="200" y1="80" x2="200" y2="200" stroke="#404040" stroke-width="2"/>
+  <!-- Scroll wheel -->
+  <rect x="190" y="120" width="20" height="40" rx="6" fill="#3a3a3a"/>
+  <!-- DPI button -->
+  <circle cx="200" cy="190" r="6" fill="#404040"/>
+  <!-- Logo G -->
+  <circle cx="200" cy="270" r="20" fill="none" stroke="#666" stroke-width="2"/>
+  <text x="200" y="278" text-anchor="middle" fill="#888" font-family="Arial" font-size="22" font-weight="bold">G</text>
+  <!-- Side button -->
+  <rect x="105" y="190" width="15" height="40" rx="3" fill="#0f0f0f"/>
+</svg>

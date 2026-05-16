@@ -1,0 +1,42 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400">
+  <defs>
+    <linearGradient id="bg-lamp" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#1a0a3a"/>
+      <stop offset="1" stop-color="#0a0518"/>
+    </linearGradient>
+    <radialGradient id="lampGlow">
+      <stop offset="0" stop-color="#ffffff" stop-opacity="0.9"/>
+      <stop offset="1" stop-color="#ffffff" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <rect width="400" height="400" fill="url(#bg-lamp)"/>
+  <!-- Left lamp glow -->
+  <circle cx="80" cy="120" r="80" fill="url(#lampGlow)"/>
+  <!-- Right lamp glow -->
+  <circle cx="320" cy="120" r="80" fill="url(#lampGlow)"/>
+
+  <!-- Left lamp -->
+  <circle cx="80" cy="120" r="35" fill="#f0f0f0"/>
+  <circle cx="80" cy="120" r="28" fill="#ffffff"/>
+  <rect x="76" y="155" width="8" height="120" fill="#2a2a2a"/>
+  <rect x="55" y="275" width="50" height="12" rx="3" fill="#1a1a1a"/>
+
+  <!-- Right lamp -->
+  <circle cx="320" cy="120" r="35" fill="#f0f0f0"/>
+  <circle cx="320" cy="120" r="28" fill="#ffffff"/>
+  <rect x="316" y="155" width="8" height="120" fill="#2a2a2a"/>
+  <rect x="295" y="275" width="50" height="12" rx="3" fill="#1a1a1a"/>
+
+  <!-- Center monitor -->
+  <rect x="150" y="150" width="100" height="70" rx="4" fill="#0f0f0f"/>
+  <rect x="155" y="155" width="90" height="60" rx="2" fill="#1a1a3a"/>
+  <rect x="160" y="160" width="35" height="50" rx="1" fill="#ec4899" opacity="0.6"/>
+  <rect x="200" y="160" width="40" height="20" rx="1" fill="#a855f7" opacity="0.6"/>
+  <rect x="200" y="185" width="40" height="25" rx="1" fill="#3b82f6" opacity="0.6"/>
+  <!-- Monitor stand -->
+  <rect x="195" y="220" width="10" height="15" fill="#0f0f0f"/>
+  <rect x="180" y="232" width="40" height="4" rx="2" fill="#1a1a1a"/>
+
+  <!-- Keyboard -->
+  <rect x="160" y="245" width="80" height="12" rx="2" fill="#1a1a1a"/>
+</svg>

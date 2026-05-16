@@ -1,0 +1,44 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 600" preserveAspectRatio="xMidYMid slice">
+  <defs>
+    <linearGradient id="bg-apps" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#0a0518"/>
+      <stop offset="1" stop-color="#1e1b4b"/>
+    </linearGradient>
+  </defs>
+  <rect width="1600" height="600" fill="url(#bg-apps)"/>
+
+  <!-- Discord icon -->
+  <rect x="150" y="200" width="180" height="180" rx="40" fill="#5865F2"/>
+  <path d="M210 280 Q210 270, 220 270 Q230 270, 230 280 Q230 290, 220 290 Q210 290, 210 280 Z" fill="white"/>
+  <path d="M250 280 Q250 270, 260 270 Q270 270, 270 280 Q270 290, 260 290 Q250 290, 250 280 Z" fill="white"/>
+  <path d="M200 310 Q240 330, 280 310" stroke="white" stroke-width="6" fill="none" stroke-linecap="round"/>
+
+  <!-- Figma -->
+  <rect x="500" y="200" width="180" height="180" rx="40" fill="#0a0a14"/>
+  <circle cx="560" cy="240" r="22" fill="#f24e1e"/>
+  <circle cx="620" cy="240" r="22" fill="#a259ff"/>
+  <circle cx="560" cy="290" r="22" fill="#1abcfe"/>
+  <circle cx="620" cy="290" r="22" fill="#0acf83"/>
+  <circle cx="560" cy="340" r="22" fill="#ff7262"/>
+
+  <!-- Play button center (overlap) -->
+  <circle cx="800" cy="300" r="50" fill="white" opacity="0.15"/>
+  <circle cx="800" cy="300" r="35" fill="#7c3aed"/>
+  <polygon points="790,285 815,300 790,315" fill="white"/>
+
+  <!-- Spotify -->
+  <rect x="150" y="200" width="180" height="180" rx="40" fill="#1DB954" transform="translate(150 200)"/>
+  <rect x="300" y="320" width="180" height="180" rx="40" fill="#1DB954"/>
+  <path d="M340 380 Q390 360, 440 380" stroke="white" stroke-width="8" fill="none" stroke-linecap="round"/>
+  <path d="M350 410 Q390 395, 430 410" stroke="white" stroke-width="6" fill="none" stroke-linecap="round"/>
+  <path d="M360 440 Q390 430, 420 440" stroke="white" stroke-width="4" fill="none" stroke-linecap="round"/>
+
+  <!-- Netflix -->
+  <rect x="1100" y="200" width="180" height="180" rx="40" fill="#0a0a14"/>
+  <path d="M1140 240 L1140 340 L1160 340 L1160 280 L1200 340 L1220 340 L1220 240 L1200 240 L1200 300 L1160 240 Z" fill="#E50914"/>
+
+  <!-- TikTok -->
+  <rect x="1300" y="320" width="180" height="180" rx="40" fill="#0a0a14"/>
+  <path d="M1370 390 Q1370 350, 1410 350 L1410 380 Q1395 380, 1395 395 L1395 440 Q1395 460, 1375 460 Q1355 460, 1355 440 Q1355 425, 1370 425" stroke="white" stroke-width="6" fill="none"/>
+  <circle cx="1410" cy="350" r="8" fill="#fe2c55"/>
+</svg>

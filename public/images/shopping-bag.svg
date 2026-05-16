@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400">
+  <defs>
+    <linearGradient id="bag" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#3b82f6"/>
+      <stop offset="1" stop-color="#1e40af"/>
+    </linearGradient>
+    <linearGradient id="hand" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#fde0c5"/>
+      <stop offset="1" stop-color="#f5b48b"/>
+    </linearGradient>
+    <linearGradient id="cuff" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#3b82f6"/>
+      <stop offset="1" stop-color="#1e40af"/>
+    </linearGradient>
+  </defs>
+  <!-- Hand & arm -->
+  <ellipse cx="120" cy="280" rx="90" ry="40" fill="url(#hand)"/>
+  <rect x="30" y="260" width="60" height="50" rx="12" fill="url(#cuff)"/>
+  <!-- Bag handles -->
+  <path d="M170 100 Q170 60, 220 60 Q270 60, 270 100" stroke="url(#bag)" stroke-width="14" fill="none" stroke-linecap="round"/>
+  <!-- Bag body -->
+  <rect x="150" y="90" width="160" height="180" rx="12" fill="url(#bag)"/>
+  <rect x="150" y="90" width="160" height="180" rx="12" fill="white" opacity="0.1"/>
+  <!-- Highlight -->
+  <rect x="160" y="100" width="20" height="160" rx="6" fill="white" opacity="0.25"/>
+</svg>

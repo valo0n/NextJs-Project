@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600">
+  <rect width="800" height="600" fill="#f5f5f7"/>
+  <!-- Screen back -->
+  <rect x="150" y="80" width="500" height="320" rx="10" fill="#1a1a1a"/>
+  <!-- Screen with red abstract -->
+  <rect x="160" y="90" width="480" height="300" rx="4" fill="#0a0a0a"/>
+  <defs>
+    <linearGradient id="acer-red" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#dc2626"/>
+      <stop offset="0.5" stop-color="#7f1d1d"/>
+      <stop offset="1" stop-color="#0a0a0a"/>
+    </linearGradient>
+  </defs>
+  <rect x="160" y="90" width="480" height="300" rx="4" fill="url(#acer-red)"/>
+  <!-- Abstract red lines -->
+  <path d="M160 200 Q400 100, 640 220" stroke="#ef4444" stroke-width="2" fill="none" opacity="0.6"/>
+  <path d="M160 250 Q400 180, 640 280" stroke="#dc2626" stroke-width="2" fill="none" opacity="0.5"/>
+  <path d="M160 320 Q400 260, 640 340" stroke="#991b1b" stroke-width="3" fill="none" opacity="0.4"/>
+  <!-- Camera dot -->
+  <circle cx="400" cy="105" r="3" fill="#2a2a2a"/>
+  <!-- Base (black) -->
+  <path d="M100 400 L700 400 L740 460 L60 460 Z" fill="#1a1a1a"/>
+  <path d="M100 400 L700 400 L700 410 L100 410 Z" fill="#0a0a0a"/>
+  <!-- RGB keyboard hint - red -->
+  <rect x="120" y="415" width="560" height="35" rx="3" fill="#0f0f0f"/>
+  <!-- Red glow under keys -->
+  <rect x="130" y="445" width="540" height="3" fill="#ef4444" opacity="0.5"/>
+  <!-- Touchpad -->
+  <rect x="350" y="455" width="100" height="5" rx="2" fill="#2a2a2a"/>
+</svg>

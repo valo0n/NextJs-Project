@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400">
+  <defs>
+    <linearGradient id="bg-chair" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#1e0a3a"/>
+      <stop offset="1" stop-color="#0a0518"/>
+    </linearGradient>
+    <linearGradient id="chair-purple" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#a855f7"/>
+      <stop offset="1" stop-color="#7c3aed"/>
+    </linearGradient>
+  </defs>
+  <rect width="400" height="400" fill="url(#bg-chair)"/>
+  <!-- Glow -->
+  <circle cx="200" cy="200" r="180" fill="#a855f7" opacity="0.15"/>
+  <!-- Backrest -->
+  <path d="M140 50 Q140 30, 200 30 Q260 30, 260 50 L260 220 Q260 240, 200 240 Q140 240, 140 220 Z" fill="#1a1a1a"/>
+  <path d="M150 60 Q150 40, 200 40 Q250 40, 250 60 L250 215 Q250 230, 200 230 Q150 230, 150 215 Z" fill="#2a2a2a"/>
+  <!-- Pink accent -->
+  <path d="M195 50 L205 50 L205 230 L195 230 Z" fill="url(#chair-purple)"/>
+  <!-- Headrest -->
+  <ellipse cx="200" cy="70" rx="40" ry="20" fill="#0f0f0f"/>
+  <!-- Seat -->
+  <rect x="135" y="240" width="130" height="50" rx="15" fill="#1a1a1a"/>
+  <!-- Armrests -->
+  <rect x="110" y="240" width="20" height="60" rx="6" fill="#0f0f0f"/>
+  <rect x="270" y="240" width="20" height="60" rx="6" fill="#0f0f0f"/>
+  <!-- Base / wheels -->
+  <rect x="195" y="290" width="10" height="40" fill="#2a2a2a"/>
+  <path d="M120 360 L200 330 L280 360" stroke="#2a2a2a" stroke-width="6" fill="none" stroke-linecap="round"/>
+  <circle cx="120" cy="365" r="10" fill="#0f0f0f"/>
+  <circle cx="200" cy="370" r="10" fill="#0f0f0f"/>
+  <circle cx="280" cy="365" r="10" fill="#0f0f0f"/>
+</svg>
