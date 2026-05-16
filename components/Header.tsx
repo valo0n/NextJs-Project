@@ -1,14 +1,17 @@
 import Link from "next/link";
 import { useState } from "react";
+import { useSession, signOut } from "next-auth/react";
 import { FIGMA } from "@/lib/figmaAssets";
 
 export default function Header() {
   const [open, setOpen] = useState<boolean>(false);
+  const [userMenuOpen, setUserMenuOpen] = useState<boolean>(false);
+  const { data: session } = useSession();
 
   return (
     <header className="absolute top-0 left-0 right-0 z-50">
       <nav className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-12 py-4 sm:py-6 flex justify-between items-center">
-        {/* Logo origjinale nga Figma */}
+        {/* Logo */}
         <Link href="/" className="flex items-center shrink-0">
           <img
             src={FIGMA.logo}
@@ -17,7 +20,7 @@ export default function Header() {
           />
         </Link>
 
-        {/* Desktop Menu - centered */}
+        {/* Desktop Menu */}
         <ul className="hidden lg:flex items-center gap-12 text-white font-bold">
           <li>
             <Link href="/" className="hover:text-paradox-glow transition">
@@ -41,7 +44,7 @@ export default function Header() {
           </li>
         </ul>
 
-        {/* Right side: Search + Login + Cart + Mobile menu */}
+        {/* Right side */}
         <div className="flex items-center gap-3 sm:gap-5">
           {/* Search */}
           <button
@@ -63,26 +66,99 @@ export default function Header() {
             </svg>
           </button>
 
-          {/* Account / Login */}
-          <Link
-            href="/login"
-            className="text-white hover:text-paradox-glow transition"
-            aria-label="Login / Account"
-          >
-            <svg
-              className="w-5 h-5 sm:w-6 sm:h-6"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
+          {/* Account: Login OSE Profile dropdown */}
+          {session ? (
+            <div className="relative">
+              <button
+                onClick={() => setUserMenuOpen(!userMenuOpen)}
+                className="flex items-center gap-2 text-white hover:text-paradox-glow transition"
+                aria-label="User menu"
+              >
+                {/* Avatar */}
+                <div
+                  className="w-8 h-8 sm:w-9 sm:h-9 rounded-full flex items-center justify-center text-sm font-bold text-white"
+                  style={{
+                    background:
+                      "linear-gradient(65deg, rgb(63, 50, 220) 0%, rgb(207, 53, 210) 100%)",
+                  }}
+                >
+                  {session.user?.name?.charAt(0).toUpperCase() || "U"}
+                </div>
+              </button>
+
+              {/* Dropdown */}
+              {userMenuOpen && (
+                <>
+                  {/* Overlay per close */}
+                  <div
+                    className="fixed inset-0 z-40"
+                    onClick={() => setUserMenuOpen(false)}
+                  />
+                  <div className="absolute right-0 top-full mt-2 w-56 bg-paradox-bg/95 backdrop-blur-md border border-white/10 rounded-xl shadow-2xl z-50 overflow-hidden">
+                    <div className="p-4 border-b border-white/10">
+                      <p className="text-white font-semibold text-sm">
+                        {session.user?.name}
+                      </p>
+                      <p className="text-gray-400 text-xs mt-1 truncate">
+                        {session.user?.email}
+                      </p>
+                    </div>
+                    <ul className="py-2">
+                      <li>
+                        <Link
+                          href="/profile"
+                          onClick={() => setUserMenuOpen(false)}
+                          className="block px-4 py-2 text-sm text-white hover:bg-white/10 transition"
+                        >
+                          👤 Profili Im
+                        </Link>
+                      </li>
+                      <li>
+                        <Link
+                          href="/profile"
+                          onClick={() => setUserMenuOpen(false)}
+                          className="block px-4 py-2 text-sm text-white hover:bg-white/10 transition"
+                        >
+                          📦 Produktet e mia
+                        </Link>
+                      </li>
+                      <li>
+                        <button
+                          onClick={() => {
+                            setUserMenuOpen(false);
+                            signOut({ callbackUrl: "/" });
+                          }}
+                          className="w-full text-left px-4 py-2 text-sm text-red-400 hover:bg-red-500/10 transition"
+                        >
+                          🚪 Dil
+                        </button>
+                      </li>
+                    </ul>
+                  </div>
+                </>
+              )}
+            </div>
+          ) : (
+            <Link
+              href="/login"
+              className="text-white hover:text-paradox-glow transition"
+              aria-label="Login"
             >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
-              />
-            </svg>
-          </Link>
+              <svg
+                className="w-5 h-5 sm:w-6 sm:h-6"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+                />
+              </svg>
+            </Link>
+          )}
 
           {/* Cart */}
           <Link
@@ -178,22 +254,34 @@ export default function Header() {
               </Link>
             </li>
             <li className="pt-2 border-t border-paradox-purple/20">
-              <Link
-                href="/login"
-                onClick={() => setOpen(false)}
-                className="block py-2 text-paradox-glow"
-              >
-                Login / Account
-              </Link>
-            </li>
-            <li>
-              <Link
-                href="/cart"
-                onClick={() => setOpen(false)}
-                className="block py-2 hover:text-paradox-glow"
-              >
-                Cart
-              </Link>
+              {session ? (
+                <>
+                  <Link
+                    href="/profile"
+                    onClick={() => setOpen(false)}
+                    className="block py-2 text-paradox-glow"
+                  >
+                    👤 Profili Im
+                  </Link>
+                  <button
+                    onClick={() => {
+                      setOpen(false);
+                      signOut({ callbackUrl: "/" });
+                    }}
+                    className="block py-2 text-red-400 w-full text-left"
+                  >
+                    🚪 Dil
+                  </button>
+                </>
+              ) : (
+                <Link
+                  href="/login"
+                  onClick={() => setOpen(false)}
+                  className="block py-2 text-paradox-glow"
+                >
+                  Login / Account
+                </Link>
+              )}
             </li>
           </ul>
         </div>
