@@ -22,7 +22,7 @@ const Blog: NextPage = () => {
       category: "Keyboard",
       author: "Admin-art",
       comments: 0,
-    image: "https://resource.logitechg.com/w_692,c_lpad,ar_16:9,q_auto,f_auto,dpr_1.0/d_transparent.gif/content/dam/gaming/en/products/pro-keyboard/pro-clicky-keyboard-gallery-1.png?v=1",
+      image: FIGMA.blog1,
     },
     {
       id: 2,
@@ -31,7 +31,8 @@ const Blog: NextPage = () => {
       category: "Keyboard",
       author: "Admin-art",
       comments: 0,
-image: "https://resource.logitechg.com/w_692,c_lpad,ar_16:9,q_auto,f_auto,dpr_1.0/d_transparent.gif/content/dam/gaming/en/products/pro-x-tkl/gallery/pro-x-tkl-black-gallery-1.png?v=1",    },
+      image: FIGMA.blog2,
+    },
     {
       id: 3,
       title: "New Logitech keyboard released!",
@@ -39,7 +40,8 @@ image: "https://resource.logitechg.com/w_692,c_lpad,ar_16:9,q_auto,f_auto,dpr_1.
       category: "Keyboard",
       author: "Admin-art",
       comments: 0,
-image: "https://resource.logitechg.com/w_692,c_lpad,ar_16:9,q_auto,f_auto,dpr_1.0/d_transparent.gif/content/dam/gaming/en/products/pro-x-tkl/gallery/pro-x-tkl-pink-gallery-1.png?v=1",    },
+      image: FIGMA.blog3,
+    },
   ];
 
   return (
@@ -52,9 +54,13 @@ image: "https://resource.logitechg.com/w_692,c_lpad,ar_16:9,q_auto,f_auto,dpr_1.
           <div className="max-w-[1440px] mx-auto">
             {/* Breadcrumb */}
             <nav className="text-sm text-gray-400 mb-12">
-              <Link href="/" className="hover:text-white">Shop</Link> / 
-              <span className="ml-1">Blog</span> / 
-              <span className="text-paradox-purple ml-1">New modern tech devices</span>
+              <Link href="/" className="hover:text-white">
+                Shop
+              </Link>{" "}
+              /<span className="ml-1">Blog</span> /
+              <span className="text-paradox-purple ml-1">
+                New modern tech devices
+              </span>
             </nav>
 
             <div className="flex flex-col lg:flex-row gap-12">
@@ -63,13 +69,13 @@ image: "https://resource.logitechg.com/w_692,c_lpad,ar_16:9,q_auto,f_auto,dpr_1.
                 {posts.map((post) => (
                   <article key={post.id} className="group">
                     <div className="mb-6 overflow-hidden rounded-lg border border-white/10">
-                      <img 
-                        src={post.image} 
-                        alt={post.title} 
-                        className="w-full aspect-video object-cover group-hover:scale-105 transition-transform duration-500" 
+                      <img
+                        src={post.image}
+                        alt={post.title}
+                        className="w-full aspect-video object-cover group-hover:scale-105 transition-transform duration-500"
                       />
                     </div>
-                    <div className="flex items-center gap-4 text-xs text-gray-400 mb-4">
+                    <div className="flex flex-wrap items-center gap-2 sm:gap-4 text-xs text-gray-400 mb-4">
                       <span>{post.date}</span>
                       <span className="w-1 h-1 bg-gray-600 rounded-full"></span>
                       <span>Modern, House, {post.category}</span>
@@ -78,92 +84,110 @@ image: "https://resource.logitechg.com/w_692,c_lpad,ar_16:9,q_auto,f_auto,dpr_1.
                       <span className="w-1 h-1 bg-gray-600 rounded-full"></span>
                       <span>💬 {post.comments}</span>
                     </div>
-                    <h2 className="text-2xl font-bold mb-4 group-hover:text-paradox-purple transition-colors">
+                    <h2 className="text-2xl sm:text-3xl font-bold mb-4 hover:text-paradox-purple transition cursor-pointer">
                       {post.title}
                     </h2>
-                    <p className="text-gray-400 leading-relaxed mb-6 max-w-3xl">
-                      Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse varius enim in eros elementum tristique. Duis cursus, mi quis viverra ornare, eros dolor interdum nulla.
+                    <p className="text-gray-400 leading-relaxed mb-6">
+                      Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+                      Suspendisse massa libero, mattis volutpat id. Egestas
+                      adipiscing placerat eleifend a nascetur.
                     </p>
-                    <Link href={`/blog/${post.id}`} className="text-sm font-bold uppercase tracking-widest border-b-2 border-paradox-purple pb-1 hover:text-paradox-purple transition-all">
-                      Read more
-                    </Link>
+                    <button className="text-paradox-purple hover:text-paradox-pink transition text-sm underline-offset-4 hover:underline">
+                      Read more →
+                    </button>
                   </article>
                 ))}
 
-                {/* Pagination Placeholder */}
-                <div className="flex items-center gap-4 pt-10">
-                  <button className="w-10 h-10 border border-white/20 flex items-center justify-center hover:bg-paradox-purple">1</button>
-                  <button className="w-10 h-10 border border-white/20 flex items-center justify-center hover:bg-paradox-purple transition-all">2</button>
-                  <button className="px-4 h-10 border border-white/20 flex items-center justify-center hover:bg-paradox-purple transition-all">Next</button>
+                {/* Comment Form */}
+                <div className="mt-20 border-t border-white/10 pt-12">
+                  <h3 className="text-2xl font-bold mb-2">Leave a Reply</h3>
+                  <p className="text-gray-400 text-sm mb-8">
+                    Your email address will not be published. Required fields
+                    are marked *
+                  </p>
+                  <form className="space-y-6">
+                    <textarea
+                      placeholder="Comment *"
+                      rows={5}
+                      className="w-full bg-white/5 border border-white/10 text-white p-4 rounded-lg focus:outline-none focus:border-paradox-purple transition placeholder:text-gray-500"
+                    />
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                      <input
+                        type="text"
+                        placeholder="Name *"
+                        className="bg-white/5 border border-white/10 text-white p-3 rounded-lg focus:outline-none focus:border-paradox-purple transition placeholder:text-gray-500"
+                      />
+                      <input
+                        type="email"
+                        placeholder="Email *"
+                        className="bg-white/5 border border-white/10 text-white p-3 rounded-lg focus:outline-none focus:border-paradox-purple transition placeholder:text-gray-500"
+                      />
+                      <input
+                        type="text"
+                        placeholder="Website"
+                        className="bg-white/5 border border-white/10 text-white p-3 rounded-lg focus:outline-none focus:border-paradox-purple transition placeholder:text-gray-500"
+                      />
+                    </div>
+                    <button
+                      type="button"
+                      className="bg-paradox-purple hover:bg-paradox-pink text-white px-8 py-3 rounded-lg transition"
+                    >
+                      Post Comment
+                    </button>
+                  </form>
                 </div>
               </div>
 
               {/* SIDEBAR */}
-              <aside className="w-full lg:w-[350px] space-y-12">
-                {/* Search Sidebar Widget */}
+              <aside className="lg:w-80 space-y-10">
+                {/* Search */}
                 <div>
-                  <h3 className="text-xl font-bold mb-6 border-l-4 border-paradox-purple pl-4">Sidebar widget</h3>
-                  <div className="relative">
-                    <img src={FIGMA.productKeyboard1} className="w-full h-40 object-cover rounded opacity-50" />
-                    <div className="absolute inset-0 p-4 flex flex-col justify-end bg-gradient-to-t from-black/80">
-                      <p className="text-xs">Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>
+                  <input
+                    type="text"
+                    placeholder="Search..."
+                    className="w-full bg-white/5 border border-white/10 text-white p-3 rounded-lg focus:outline-none focus:border-paradox-purple transition placeholder:text-gray-500"
+                  />
+                </div>
+
+                {/* Recent Post Widget */}
+                <div>
+                  <h3 className="font-bold text-lg mb-4">Recent post</h3>
+                  <div className="flex gap-3 group cursor-pointer">
+                    <img
+                      src={FIGMA.productKeyboard1}
+                      alt="Recent post"
+                      className="w-20 h-20 object-cover rounded opacity-80 group-hover:opacity-100 transition"
+                    />
+                    <div>
+                      <p className="text-sm font-medium group-hover:text-paradox-purple transition">
+                        Logitech's latest keyboard
+                      </p>
+                      <p className="text-xs text-gray-400 mt-1">Sep 20, 2022</p>
                     </div>
                   </div>
                 </div>
 
                 {/* Categories */}
                 <div>
-                  <h3 className="text-xl font-bold mb-6 border-l-4 border-paradox-purple pl-4">Category</h3>
-                  <ul className="space-y-4">
+                  <h3 className="font-bold text-lg mb-4">Categories</h3>
+                  <ul className="space-y-3">
                     {categories.map((cat) => (
-                      <li key={cat.name} className="flex justify-between items-center text-gray-400 hover:text-white cursor-pointer transition-colors">
-                        <span>{cat.name}</span>
-                        <span>({cat.count})</span>
+                      <li key={cat.name}>
+                        <Link
+                          href="#"
+                          className="flex justify-between items-center text-gray-300 hover:text-white transition"
+                        >
+                          <span>{cat.name}</span>
+                          <span className="text-gray-500 text-sm">
+                            ({cat.count})
+                          </span>
+                        </Link>
                       </li>
                     ))}
                   </ul>
                 </div>
-
-                {/* Recent Posts */}
-                <div>
-                  <h3 className="text-xl font-bold mb-6 border-l-4 border-paradox-purple pl-4">Recent post</h3>
-                  <div className="space-y-6">
-                    {[1, 2, 3].map((i) => (
-                      <p key={i} className="text-gray-400 hover:text-paradox-purple cursor-pointer text-sm leading-relaxed">
-                        Lorem ipsum dolor sit amet, consectetur
-                      </p>
-                    ))}
-                  </div>
-                </div>
               </aside>
             </div>
-
-            {/* COMMENT SECTION */}
-            <section className="mt-24 max-w-4xl">
-              <h3 className="text-2xl font-bold mb-8">Post a comment</h3>
-              <form className="grid grid-cols-1 gap-6">
-                <textarea 
-                  placeholder="Your comment" 
-                  rows={6} 
-                  className="bg-transparent border border-white/20 p-4 focus:border-paradox-purple outline-none transition-colors"
-                />
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                  <input type="text" placeholder="Your name" className="bg-transparent border border-white/20 p-4 focus:border-paradox-purple outline-none" />
-                  <input type="email" placeholder="Your email" className="bg-transparent border border-white/20 p-4 focus:border-paradox-purple outline-none" />
-                  <input type="text" placeholder="Website" className="bg-transparent border border-white/20 p-4 focus:border-paradox-purple outline-none" />
-                </div>
-                <div className="flex items-center gap-3 text-sm text-gray-400">
-                  <input type="checkbox" id="save-info" className="accent-paradox-purple" />
-                  <label htmlFor="save-info">Save my name, email and website in this browser for the next time I comment.</label>
-                </div>
-                <button 
-                  type="submit"
-                  className="bg-[#2a2a2a] hover:bg-paradox-purple text-white px-10 py-4 w-fit transition-colors uppercase font-bold tracking-widest"
-                >
-                  Submit
-                </button>
-              </form>
-            </section>
           </div>
         </div>
       </Layout>
