@@ -122,6 +122,18 @@ export default function Header() {
                           📦 Produktet e mia
                         </Link>
                       </li>
+                      {session.user?.role === "admin" && (
+                        <li>
+                          <Link
+                            href="/dashboard"
+                            onClick={() => setUserMenuOpen(false)}
+                            className="block px-4 py-2 text-sm font-semibold transition hover:bg-paradox-purple/10"
+                            style={{ color: "#cf35d2" }}
+                          >
+                            👑 Admin Dashboard
+                          </Link>
+                        </li>
+                      )}
                       <li>
                         <button
                           onClick={() => {
@@ -263,6 +275,16 @@ export default function Header() {
                   >
                     👤 Profili Im
                   </Link>
+                  {session.user?.role === "admin" && (
+                    <Link
+                      href="/dashboard"
+                      onClick={() => setOpen(false)}
+                      className="block py-2 font-semibold"
+                      style={{ color: "#cf35d2" }}
+                    >
+                      👑 Admin Dashboard
+                    </Link>
+                  )}
                   <button
                     onClick={() => {
                       setOpen(false);

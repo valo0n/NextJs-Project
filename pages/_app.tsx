@@ -3,6 +3,7 @@ import type { AppProps } from "next/app";
 import { SessionProvider } from "next-auth/react";
 import { CartProvider } from "@/context/CartContext";
 import { UserProductsProvider } from "@/context/UserProductsContext";
+import { DashboardProvider } from "@/context/DashboardContext";
 import { Toaster } from "react-hot-toast";
 
 export default function App({
@@ -13,8 +14,10 @@ export default function App({
     <SessionProvider session={session}>
       <CartProvider>
         <UserProductsProvider>
-          <Toaster position="top-right" />
-          <Component {...pageProps} />
+          <DashboardProvider>
+            <Toaster position="top-right" />
+            <Component {...pageProps} />
+          </DashboardProvider>
         </UserProductsProvider>
       </CartProvider>
     </SessionProvider>
