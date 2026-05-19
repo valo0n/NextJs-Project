@@ -13,6 +13,8 @@ interface RegisterFormData {
   password: string;
 }
 
+type AccountType = "user" | "seller";
+
 const Register: NextPage = () => {
   const {
     register,
@@ -22,6 +24,7 @@ const Register: NextPage = () => {
   const router = useRouter();
   const [loading, setLoading] = useState<boolean>(false);
   const [showPassword, setShowPassword] = useState<boolean>(false);
+  const [accountType, setAccountType] = useState<AccountType>("user");
 
   const onSubmit: SubmitHandler<RegisterFormData> = async (data) => {
     setLoading(true);
@@ -29,11 +32,16 @@ const Register: NextPage = () => {
       const res = await fetch("/api/auth/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data),
+        body: JSON.stringify({ ...data, role: accountType }),
       });
       const result = await res.json();
       if (!res.ok) throw new Error(result.message);
-      toast.success("Llogaria u krijua! Kyçu tani.");
+
+      const successMsg =
+        accountType === "seller"
+          ? "Llogaria e biznesit u krijua! Kyçu tani."
+          : "Llogaria u krijua! Kyçu tani.";
+      toast.success(successMsg);
       router.push("/login");
     } catch (err) {
       const message = err instanceof Error ? err.message : "Gabim";
@@ -50,11 +58,11 @@ const Register: NextPage = () => {
       </Head>
 
       <div className="min-h-screen bg-paradox-bg relative overflow-hidden flex items-center justify-center px-4 py-12">
-        {/* Glow effects ne sfond */}
+        {/* Glow effects */}
         <div className="absolute top-[-20%] left-[-10%] w-[500px] h-[500px] sm:w-[800px] sm:h-[800px] rounded-full bg-paradox-purple/20 blur-[120px] pointer-events-none" />
         <div className="absolute bottom-[-20%] right-[-10%] w-[500px] h-[500px] sm:w-[800px] sm:h-[800px] rounded-full bg-[#cf35d2]/15 blur-[120px] pointer-events-none" />
 
-        {/* Logo lart */}
+        {/* Logo */}
         <Link
           href="/"
           className="absolute top-6 left-6 lg:top-8 lg:left-12 z-20"
@@ -75,7 +83,7 @@ const Register: NextPage = () => {
             }}
           >
             {/* Header */}
-            <div className="text-center mb-8">
+            <div className="text-center mb-6">
               <h1 className="text-3xl sm:text-4xl font-bold mb-3 uppercase tracking-wider">
                 Krijo{" "}
                 <span
@@ -93,6 +101,44 @@ const Register: NextPage = () => {
               </p>
             </div>
 
+            {/* Account Type Selector */}
+            <div className="mb-6">
+              <p className="text-sm font-medium text-gray-300 mb-3 text-center">
+                Lloji i llogarisë
+              </p>
+              <div className="grid grid-cols-2 gap-3">
+                {/* Klient */}
+                <button
+                  type="button"
+                  onClick={() => setAccountType("user")}
+                  className={`p-4 rounded-lg border-2 transition-all ${
+                    accountType === "user"
+                      ? "border-[#cf35d2] bg-paradox-purple/10"
+                      : "border-white/10 bg-white/5 hover:border-white/30"
+                  }`}
+                >
+                  <div className="text-3xl mb-2">🛍️</div>
+                  <p className="text-sm font-bold text-white">Klient</p>
+                  <p className="text-xs text-gray-400 mt-1">Blej produkte</p>
+                </button>
+
+                {/* Biznes/Shites */}
+                <button
+                  type="button"
+                  onClick={() => setAccountType("seller")}
+                  className={`p-4 rounded-lg border-2 transition-all ${
+                    accountType === "seller"
+                      ? "border-[#cf35d2] bg-paradox-purple/10"
+                      : "border-white/10 bg-white/5 hover:border-white/30"
+                  }`}
+                >
+                  <div className="text-3xl mb-2">🏪</div>
+                  <p className="text-sm font-bold text-white">Biznes</p>
+                  <p className="text-xs text-gray-400 mt-1">Shes produkte</p>
+                </button>
+              </div>
+            </div>
+
             {/* Form */}
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
               {/* Name */}
@@ -101,7 +147,7 @@ const Register: NextPage = () => {
                   htmlFor="name"
                   className="block text-sm font-medium text-gray-300 mb-2"
                 >
-                  Emri
+                  {accountType === "seller" ? "Emri i biznesit" : "Emri"}
                 </label>
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -111,18 +157,29 @@ const Register: NextPage = () => {
                       stroke="currentColor"
                       viewBox="0 0 24 24"
                     >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
-                      />
+                      {accountType === "seller" ? (
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"
+                        />
+                      ) : (
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+                        />
+                      )}
                     </svg>
                   </div>
                   <input
                     id="name"
                     type="text"
-                    placeholder="Emri yt"
+                    placeholder={
+                      accountType === "seller" ? "P.sh. Tech Store" : "Emri yt"
+                    }
                     {...register("name", {
                       required: "Emri është i detyrueshëm",
                       minLength: { value: 2, message: "Së paku 2 karaktere" },
@@ -298,6 +355,8 @@ const Register: NextPage = () => {
                     </svg>
                     Duke u krijuar...
                   </span>
+                ) : accountType === "seller" ? (
+                  "Regjistro Biznesin"
                 ) : (
                   "Regjistrohu"
                 )}
