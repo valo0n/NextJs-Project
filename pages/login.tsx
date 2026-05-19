@@ -43,6 +43,8 @@ const Login: NextPage = () => {
         const session = await sessionRes.json();
         if (session?.user?.role === "admin") {
           router.push("/dashboard");
+        } else if (session?.user?.role === "seller") {
+          router.push("/profile");
         } else {
           router.push("/");
         }

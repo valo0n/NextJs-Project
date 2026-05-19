@@ -40,8 +40,18 @@ const Profile: NextPage = () => {
   useEffect(() => {
     if (status === "unauthenticated") {
       router.push("/login");
+      return;
     }
-  }, [status, router]);
+    // Klient (user) nuk ka qasje ne profile - vetem seller dhe admin
+    if (
+      status === "authenticated" &&
+      session?.user?.role !== "seller" &&
+      session?.user?.role !== "admin"
+    ) {
+      toast.error("Vetëm shitësit kanë qasje në Profile");
+      router.push("/");
+    }
+  }, [status, session, router]);
 
   if (status === "loading") {
     return (
@@ -198,12 +208,16 @@ const Profile: NextPage = () => {
                         className={`inline-block px-3 py-1 rounded-full text-xs font-semibold ${
                           session.user?.role === "admin"
                             ? "bg-red-500/20 text-red-400 border border-red-500/40"
-                            : "bg-blue-500/20 text-blue-400 border border-blue-500/40"
+                            : session.user?.role === "seller"
+                              ? "bg-green-500/20 text-green-400 border border-green-500/40"
+                              : "bg-blue-500/20 text-blue-400 border border-blue-500/40"
                         }`}
                       >
                         {session.user?.role === "admin"
                           ? "👑 Admin"
-                          : "👤 Përdorues"}
+                          : session.user?.role === "seller"
+                            ? "🏪 Shitës"
+                            : "🛍️ Klient"}
                       </span>
                     </div>
                   </div>
