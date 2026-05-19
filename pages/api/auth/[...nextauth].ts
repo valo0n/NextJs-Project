@@ -23,7 +23,10 @@ export const authOptions: NextAuthOptions = {
         if (!user || !user.password) {
           throw new Error("Email ose fjalëkalimi nuk është i saktë");
         }
-        const isValid = await bcrypt.compare(credentials.password, user.password);
+        const isValid = await bcrypt.compare(
+          credentials.password,
+          user.password,
+        );
         if (!isValid) {
           throw new Error("Email ose fjalëkalimi nuk është i saktë");
         }
