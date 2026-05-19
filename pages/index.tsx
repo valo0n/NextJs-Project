@@ -1,8 +1,24 @@
 import Layout from "@/components/Layout";
 import Head from "next/head";
 import Link from "next/link";
-import { NextPage } from "next";
+import { NextPage, GetStaticProps } from "next";
 import { FIGMA } from "@/lib/figmaAssets";
+import { dbConnect } from "@/lib/dbConnect";
+import Product from "@/models/Product";
+
+// Tipi i produktit per Home
+interface HomeProduct {
+  _id: string;
+  title: string;
+  description: string;
+  price: number;
+  image?: string;
+  category?: string;
+}
+
+interface HomeProps {
+  products: HomeProduct[];
+}
 
 // Buton "View more" sipas dizajnit (border simple)
 function ViewMoreButton({ href = "/shop" }: { href?: string }) {
@@ -29,7 +45,7 @@ function ViewMoreButton({ href = "/shop" }: { href?: string }) {
   );
 }
 
-const Home: NextPage = () => {
+const Home: NextPage<HomeProps> = ({ products }) => {
   return (
     <>
       <Head>
@@ -97,56 +113,47 @@ const Home: NextPage = () => {
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-10 mb-12">
-              {/* Product 1 - Mouse */}
-              <div className="group">
-                <div className="relative border-[3px] border-[#cf35d2] rounded-lg overflow-hidden aspect-[4/5] mb-6 group-hover:shadow-[0_0_30px_rgba(207,53,210,0.5)] transition-shadow">
-                  <img
-                    src={FIGMA.productMouse}
-                    alt="Logitech PRO X Wireless Mouse"
-                    className="w-full h-full object-cover"
-                  />
+              {products.length === 0 ? (
+                <div className="col-span-full text-center py-12">
+                  <p className="text-gray-400 text-lg mb-4">
+                    Nuk ka produkte në databazë.
+                  </p>
+                  <p className="text-gray-500 text-sm">
+                    Vizito{" "}
+                    <Link
+                      href="/api/seed"
+                      className="text-paradox-glow hover:underline"
+                    >
+                      /api/seed
+                    </Link>{" "}
+                    për të mbushur DB me produkte fillestare.
+                  </p>
                 </div>
-                <div className="text-center">
-                  <h3 className="font-bold text-base lg:text-lg mb-2 capitalize">
-                    logitech PRO X Rechargeable Wireless
-                  </h3>
-                  <p className="text-[#ececec] text-xl">$ 160,00</p>
-                </div>
-              </div>
-
-              {/* Product 2 - Headset */}
-              <div className="group">
-                <div className="relative border-[3px] border-[#cf35d2] rounded-lg overflow-hidden aspect-[4/5] mb-6 group-hover:shadow-[0_0_30px_rgba(207,53,210,0.5)] transition-shadow">
-                  <img
-                    src={FIGMA.productHeadset}
-                    alt="Logitech PRO X Gaming Headset"
-                    className="w-full h-full object-cover"
-                  />
-                </div>
-                <div className="text-center">
-                  <h3 className="font-bold text-base lg:text-lg mb-2 capitalize">
-                    Logitech PRO X Gaming Headset
-                  </h3>
-                  <p className="text-[#ececec] text-xl">$ 223,00</p>
-                </div>
-              </div>
-
-              {/* Product 3 - Controller */}
-              <div className="group">
-                <div className="relative border-[3px] border-[#cf35d2] rounded-lg overflow-hidden aspect-[4/5] mb-6 group-hover:shadow-[0_0_30px_rgba(207,53,210,0.5)] transition-shadow">
-                  <img
-                    src={FIGMA.productController}
-                    alt="PS4 PlayStation Controller"
-                    className="w-full h-full object-cover"
-                  />
-                </div>
-                <div className="text-center">
-                  <h3 className="font-bold text-base lg:text-lg mb-2 capitalize">
-                    PS4 PlayStation 4 Dualshock 4 Wireless Controller Black
-                  </h3>
-                  <p className="text-[#ececec] text-xl">$ 79,00</p>
-                </div>
-              </div>
+              ) : (
+                products.slice(0, 3).map((product) => (
+                  <Link
+                    href={`/shop/${product._id}`}
+                    key={product._id}
+                    className="group"
+                  >
+                    <div className="relative border-[3px] border-[#cf35d2] rounded-lg overflow-hidden aspect-[4/5] mb-6 group-hover:shadow-[0_0_30px_rgba(207,53,210,0.5)] transition-shadow">
+                      <img
+                        src={product.image || FIGMA.productMouse}
+                        alt={product.title}
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                    <div className="text-center">
+                      <h3 className="font-bold text-base lg:text-lg mb-2 capitalize line-clamp-2 min-h-[3rem]">
+                        {product.title}
+                      </h3>
+                      <p className="text-[#ececec] text-xl">
+                        $ {product.price.toFixed(2)}
+                      </p>
+                    </div>
+                  </Link>
+                ))
+              )}
             </div>
 
             <div className="text-center">
@@ -306,7 +313,7 @@ const Home: NextPage = () => {
                     "linear-gradient(65deg, rgb(63, 50, 220) 0%, rgb(207, 53, 210) 100%)",
                 }}
               >
-                Another Level!  
+                Another Level!
               </h2>
               <p className="text-[#ececec] text-base sm:text-lg lg:text-2xl leading-relaxed">
                 Enter here an impactful phrase that describes who you are, what
@@ -351,3 +358,32 @@ const Home: NextPage = () => {
 };
 
 export default Home;
+
+// SSG + ISR - faqja generohet ne build dhe rifreskohet automatikisht cdo 60s
+export const getStaticProps: GetStaticProps<HomeProps> = async () => {
+  let products: HomeProduct[] = [];
+
+  try {
+    if (process.env.MONGODB_URI) {
+      await dbConnect();
+      const docs = await Product.find({}).sort({ createdAt: -1 }).lean();
+      products = docs.map((p) => ({
+        _id: p._id.toString(),
+        title: p.title,
+        description: p.description,
+        price: p.price,
+        image: p.image,
+        category: p.category,
+      }));
+    }
+  } catch (error) {
+    console.error("Gabim ne getStaticProps:", error);
+    // Lej build te vazhdoje me lloje bosh
+  }
+
+  return {
+    props: { products },
+    // ISR - rifresko faqen cdo 60 sekonda
+    revalidate: 60,
+  };
+};
