@@ -5,7 +5,7 @@ export interface IUserDoc extends Document {
   email: string;
   password?: string;
   image?: string;
-  role: "user" | "admin";
+  role: "user" | "seller" | "admin";
   provider: string;
   createdAt: Date;
   updatedAt: Date;
@@ -17,10 +17,14 @@ const UserSchema = new Schema<IUserDoc>(
     email: { type: String, required: true, unique: true },
     password: { type: String },
     image: { type: String },
-    role: { type: String, enum: ["user", "admin"], default: "user" },
+    role: {
+      type: String,
+      enum: ["user", "seller", "admin"],
+      default: "user",
+    },
     provider: { type: String, default: "credentials" },
   },
-  { timestamps: true }
+  { timestamps: true },
 );
 
 const User: Model<IUserDoc> =
