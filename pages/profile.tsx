@@ -3,30 +3,45 @@ import Head from "next/head";
 import { NextPage } from "next";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/router";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import Link from "next/link";
 import toast from "react-hot-toast";
 import { useForm, SubmitHandler } from "react-hook-form";
-import { useUserProducts, UserProduct } from "@/context/UserProductsContext";
 
 interface ProductFormData {
   title: string;
   description: string;
   price: number;
   category: string;
-  image: string;
   stock: number;
+}
+
+interface DBProduct {
+  _id: string;
+  title: string;
+  description: string;
+  price: number;
+  image?: string;
+  category?: string;
+  stock: number;
+  createdBy?: string;
+  createdAt: string;
 }
 
 const Profile: NextPage = () => {
   const { data: session, status } = useSession();
   const router = useRouter();
-  const { products, addProduct, updateProduct, deleteProduct } =
-    useUserProducts();
 
   const [activeTab, setActiveTab] = useState<"info" | "products">("info");
   const [showAddForm, setShowAddForm] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
+  const [imageFile, setImageFile] = useState<File | null>(null);
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [uploading, setUploading] = useState(false);
+
+  // Produktet nga MongoDB
+  const [products, setProducts] = useState<DBProduct[]>([]);
+  const [loadingProducts, setLoadingProducts] = useState(true);
 
   const {
     register,
@@ -36,13 +51,12 @@ const Profile: NextPage = () => {
     formState: { errors },
   } = useForm<ProductFormData>();
 
-  // Redirect te login nese nuk eshte kyqur
+  // Auth guard - vetem seller dhe admin
   useEffect(() => {
     if (status === "unauthenticated") {
       router.push("/login");
       return;
     }
-    // Klient (user) nuk ka qasje ne profile - vetem seller dhe admin
     if (
       status === "authenticated" &&
       session?.user?.role !== "seller" &&
@@ -52,6 +66,29 @@ const Profile: NextPage = () => {
       router.push("/");
     }
   }, [status, session, router]);
+
+  // Merr produktet nga MongoDB
+  const fetchProducts = useCallback(async () => {
+    if (!session?.user?.id) return;
+    setLoadingProducts(true);
+    try {
+      const res = await fetch(`/api/products?createdBy=${session.user.id}`);
+      if (res.ok) {
+        const data = await res.json();
+        setProducts(data);
+      }
+    } catch {
+      toast.error("Gabim në ngarkimin e produkteve");
+    } finally {
+      setLoadingProducts(false);
+    }
+  }, [session?.user?.id]);
+
+  useEffect(() => {
+    if (status === "authenticated" && session?.user?.id) {
+      fetchProducts();
+    }
+  }, [status, session, fetchProducts]);
 
   if (status === "loading") {
     return (
@@ -65,51 +102,155 @@ const Profile: NextPage = () => {
 
   if (!session) return null;
 
-  const onSubmit: SubmitHandler<ProductFormData> = (data) => {
-    if (editingId) {
-      updateProduct(editingId, {
-        ...data,
-        price: Number(data.price),
-        stock: Number(data.stock),
-      });
-      toast.success("Produkti u përditësua!");
-      setEditingId(null);
-    } else {
-      addProduct({
-        ...data,
-        price: Number(data.price),
-        stock: Number(data.stock),
-      });
-      toast.success("Produkti u shtua me sukses!");
+  // Upload image
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (!file.type.startsWith("image/")) {
+      toast.error("Vetëm imazhe lejohen (JPG, PNG, WebP)");
+      return;
     }
-    reset();
-    setShowAddForm(false);
+    if (file.size > 5 * 1024 * 1024) {
+      toast.error("Foto duhet të jetë deri 5MB");
+      return;
+    }
+    setImageFile(file);
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+      setImagePreview(ev.target?.result as string);
+    };
+    reader.readAsDataURL(file);
   };
 
-  const handleEdit = (product: UserProduct) => {
-    setEditingId(product.id);
+  // Submit produkt - ruan ne MongoDB
+  const onSubmit: SubmitHandler<ProductFormData> = async (data) => {
+    let imageUrl = imagePreview || "";
+
+    // Upload foto nese ka file te ri
+    if (imageFile) {
+      setUploading(true);
+      try {
+        const formData = new FormData();
+        formData.append("image", imageFile);
+        const uploadRes = await fetch("/api/upload", {
+          method: "POST",
+          body: formData,
+        });
+        const uploadData = await uploadRes.json();
+        if (!uploadRes.ok) {
+          toast.error(uploadData.message || "Gabim në ngarkim");
+          setUploading(false);
+          return;
+        }
+        imageUrl = uploadData.url;
+      } catch {
+        toast.error("Gabim në ngarkim të fotos");
+        setUploading(false);
+        return;
+      }
+      setUploading(false);
+    }
+
+    if (!imageUrl && !editingId) {
+      toast.error("Zgjedh një foto për produktin");
+      return;
+    }
+
+    try {
+      if (editingId) {
+        // PUT - update ne MongoDB
+        const res = await fetch(`/api/products/${editingId}`, {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            ...data,
+            price: Number(data.price),
+            stock: Number(data.stock),
+            ...(imageUrl && !imageUrl.startsWith("data:")
+              ? { image: imageUrl }
+              : {}),
+          }),
+        });
+        if (!res.ok) {
+          const err = await res.json();
+          throw new Error(err.message);
+        }
+        toast.success("Produkti u përditësua!");
+      } else {
+        // POST - krijon ne MongoDB
+        const res = await fetch("/api/products", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            ...data,
+            price: Number(data.price),
+            stock: Number(data.stock),
+            image: imageUrl,
+          }),
+        });
+        if (!res.ok) {
+          const err = await res.json();
+          throw new Error(err.message);
+        }
+        toast.success("Produkti u shtua me sukses!");
+      }
+
+      // Rifresko listen e produkteve nga MongoDB
+      await fetchProducts();
+      reset();
+      setImageFile(null);
+      setImagePreview(null);
+      setShowAddForm(false);
+      setEditingId(null);
+    } catch (err) {
+      const message = err instanceof Error ? err.message : "Gabim";
+      toast.error(message);
+    }
+  };
+
+  const handleEdit = (product: DBProduct) => {
+    setEditingId(product._id);
     setValue("title", product.title);
     setValue("description", product.description);
     setValue("price", product.price);
-    setValue("category", product.category);
-    setValue("image", product.image);
+    setValue("category", product.category || "");
     setValue("stock", product.stock);
+    setImagePreview(product.image || null);
+    setImageFile(null);
     setShowAddForm(true);
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
-  const handleDelete = (id: string, title: string) => {
-    if (confirm(`A je i sigurt që do të fshish "${title}"?`)) {
-      deleteProduct(id);
+  const handleDelete = async (product: DBProduct) => {
+    if (!confirm(`A je i sigurt që do të fshish "${product.title}"?`)) return;
+
+    try {
+      const res = await fetch(`/api/products/${product._id}`, {
+        method: "DELETE",
+      });
+      if (!res.ok) {
+        const err = await res.json();
+        throw new Error(err.message);
+      }
       toast.success("Produkti u fshi");
+      await fetchProducts();
+    } catch (err) {
+      const message = err instanceof Error ? err.message : "Gabim";
+      toast.error(message);
     }
   };
 
   const handleCancel = () => {
     setShowAddForm(false);
     setEditingId(null);
+    setImageFile(null);
+    setImagePreview(null);
     reset();
   };
+
+  // Statistika
+  const totalValue = products.reduce((sum, p) => sum + p.price * p.stock, 0);
+  const totalStock = products.reduce((sum, p) => sum + p.stock, 0);
 
   return (
     <>
@@ -236,16 +377,13 @@ const Profile: NextPage = () => {
                   <div className="border border-white/10 rounded-2xl p-6 bg-paradox-bg/40 backdrop-blur-sm">
                     <p className="text-gray-400 text-sm mb-2">Vlera totale</p>
                     <p className="text-3xl font-bold text-paradox-glow">
-                      $
-                      {products
-                        .reduce((sum, p) => sum + p.price * p.stock, 0)
-                        .toFixed(2)}
+                      ${totalValue.toFixed(2)}
                     </p>
                   </div>
                   <div className="border border-white/10 rounded-2xl p-6 bg-paradox-bg/40 backdrop-blur-sm">
                     <p className="text-gray-400 text-sm mb-2">Stock total</p>
                     <p className="text-3xl font-bold text-paradox-glow">
-                      {products.reduce((sum, p) => sum + p.stock, 0)}
+                      {totalStock}
                     </p>
                   </div>
 
@@ -294,20 +432,7 @@ const Profile: NextPage = () => {
                           "linear-gradient(65deg, rgb(63, 50, 220) 0%, rgb(207, 53, 210) 100%)",
                       }}
                     >
-                      <svg
-                        className="w-5 h-5"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M12 6v6m0 0v6m0-6h6m-6 0H6"
-                        />
-                      </svg>
-                      Shto produkt të ri
+                      + Shto produkt të ri
                     </button>
                   </div>
                 )}
@@ -318,7 +443,6 @@ const Profile: NextPage = () => {
                     <h2 className="text-2xl font-bold mb-6">
                       {editingId ? "Përditëso produktin" : "Shto produkt të ri"}
                     </h2>
-
                     <form
                       onSubmit={handleSubmit(onSubmit)}
                       className="space-y-4"
@@ -424,7 +548,10 @@ const Profile: NextPage = () => {
                             placeholder="0.00"
                             {...register("price", {
                               required: "Çmimi është i detyrueshëm",
-                              min: { value: 0, message: "Çmimi duhet >= 0" },
+                              min: {
+                                value: 0,
+                                message: "Çmimi duhet >= 0",
+                              },
                             })}
                             className="w-full bg-white/5 border border-white/10 text-white px-4 py-3 rounded-lg focus:outline-none focus:border-[#cf35d2] transition placeholder:text-gray-500"
                           />
@@ -445,7 +572,10 @@ const Profile: NextPage = () => {
                             placeholder="0"
                             {...register("stock", {
                               required: "Stock është i detyrueshëm",
-                              min: { value: 0, message: "Stock duhet >= 0" },
+                              min: {
+                                value: 0,
+                                message: "Stock duhet >= 0",
+                              },
                             })}
                             className="w-full bg-white/5 border border-white/10 text-white px-4 py-3 rounded-lg focus:outline-none focus:border-[#cf35d2] transition placeholder:text-gray-500"
                           />
@@ -457,38 +587,84 @@ const Profile: NextPage = () => {
                         </div>
                       </div>
 
+                      {/* Image upload */}
                       <div>
                         <label className="block text-sm font-medium text-gray-300 mb-2">
-                          URL e imazhit *
+                          Foto e produktit *
                         </label>
-                        <input
-                          type="url"
-                          placeholder="https://images.unsplash.com/..."
-                          {...register("image", {
-                            required: "URL e imazhit është e detyrueshme",
-                          })}
-                          className="w-full bg-white/5 border border-white/10 text-white px-4 py-3 rounded-lg focus:outline-none focus:border-[#cf35d2] transition placeholder:text-gray-500"
-                        />
-                        {errors.image && (
-                          <p className="text-red-400 text-xs mt-1">
-                            {errors.image.message}
-                          </p>
+
+                        {imagePreview && (
+                          <div className="mb-3 relative inline-block">
+                            <img
+                              src={imagePreview}
+                              alt="Preview"
+                              className="w-32 h-32 object-cover rounded-lg border-2 border-[#cf35d2]/50"
+                            />
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setImageFile(null);
+                                setImagePreview(null);
+                              }}
+                              className="absolute -top-2 -right-2 w-6 h-6 bg-red-500 text-white rounded-full text-xs flex items-center justify-center hover:bg-red-600 transition"
+                            >
+                              ✕
+                            </button>
+                          </div>
                         )}
-                        <p className="text-gray-500 text-xs mt-1">
-                          Tip: Përdor URL nga Unsplash ose CDN tjetër publik
-                        </p>
+
+                        <label className="block cursor-pointer">
+                          <div className="flex items-center gap-3 bg-white/5 border-2 border-dashed border-white/20 hover:border-[#cf35d2]/50 rounded-lg p-4 transition group">
+                            <div className="w-12 h-12 rounded-lg bg-paradox-purple/20 flex items-center justify-center group-hover:bg-paradox-purple/30 transition">
+                              <svg
+                                className="w-6 h-6 text-paradox-purple"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                              >
+                                <path
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  strokeWidth={2}
+                                  d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
+                                />
+                              </svg>
+                            </div>
+                            <div>
+                              <p className="text-sm font-medium text-white">
+                                {imagePreview
+                                  ? "Ndrysho foton"
+                                  : "Zgjedh foto nga kompjuteri"}
+                              </p>
+                              <p className="text-xs text-gray-500">
+                                JPG, PNG, WebP — Max 5MB
+                              </p>
+                            </div>
+                          </div>
+                          <input
+                            type="file"
+                            accept="image/*"
+                            onChange={handleImageChange}
+                            className="hidden"
+                          />
+                        </label>
                       </div>
 
                       <div className="flex flex-wrap gap-3 pt-4">
                         <button
                           type="submit"
-                          className="px-6 py-3 rounded-lg text-white font-semibold transition-all hover:shadow-[0_0_20px_rgba(207,53,210,0.4)]"
+                          disabled={uploading}
+                          className="px-6 py-3 rounded-lg text-white font-semibold transition-all hover:shadow-[0_0_20px_rgba(207,53,210,0.4)] disabled:opacity-50 disabled:cursor-not-allowed"
                           style={{
                             background:
                               "linear-gradient(65deg, rgb(63, 50, 220) 0%, rgb(207, 53, 210) 100%)",
                           }}
                         >
-                          {editingId ? "Përditëso" : "Shto produktin"}
+                          {uploading
+                            ? "Duke ngarkuar foton..."
+                            : editingId
+                              ? "Përditëso"
+                              : "Shto produktin"}
                         </button>
                         <button
                           type="button"
@@ -503,7 +679,11 @@ const Profile: NextPage = () => {
                 )}
 
                 {/* Products list */}
-                {products.length === 0 ? (
+                {loadingProducts ? (
+                  <div className="text-center py-16">
+                    <p className="text-gray-400">Duke ngarkuar produktet...</p>
+                  </div>
+                ) : products.length === 0 ? (
                   <div className="text-center py-16 border border-white/10 rounded-2xl bg-paradox-bg/30">
                     <div className="w-20 h-20 mx-auto mb-4 rounded-full bg-paradox-purple/20 flex items-center justify-center">
                       <svg
@@ -543,24 +723,24 @@ const Profile: NextPage = () => {
                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                     {products.map((product) => (
                       <div
-                        key={product.id}
+                        key={product._id}
                         className="border border-white/10 hover:border-[#cf35d2]/50 rounded-2xl overflow-hidden bg-paradox-bg/40 backdrop-blur-sm transition-all hover:shadow-[0_0_20px_rgba(207,53,210,0.3)]"
                       >
                         <div className="aspect-square bg-white/5 overflow-hidden">
                           <img
-                            src={product.image}
+                            src={product.image || "/images/placeholder.svg"}
                             alt={product.title}
                             className="w-full h-full object-cover"
                             onError={(e) => {
                               (e.target as HTMLImageElement).src =
-                                "https://placehold.co/400x400/1a1a3a/cf35d2?text=Image+Error";
+                                "https://placehold.co/400x400/1a1a3a/cf35d2?text=No+Image";
                             }}
                           />
                         </div>
                         <div className="p-5">
                           <div className="flex items-start justify-between mb-2">
                             <span className="text-xs px-2 py-1 rounded-full bg-paradox-purple/20 text-paradox-purple">
-                              {product.category}
+                              {product.category || "Other"}
                             </span>
                             <span className="text-xs text-gray-500">
                               Stock: {product.stock}
@@ -585,9 +765,7 @@ const Profile: NextPage = () => {
                               Edito
                             </button>
                             <button
-                              onClick={() =>
-                                handleDelete(product.id, product.title)
-                              }
+                              onClick={() => handleDelete(product)}
                               className="flex-1 px-3 py-2 text-sm rounded-lg border border-red-500/50 text-red-400 hover:bg-red-500/10 transition"
                             >
                               Fshij
