@@ -17,7 +17,7 @@ export default async function handler(
 
   await dbConnect();
 
-  // GET nje produkt
+  // GET nje produkt (publik)
   if (req.method === "GET") {
     try {
       const product = await Product.findById(id).lean();
@@ -25,18 +25,30 @@ export default async function handler(
         return res.status(404).json({ message: "Produkti nuk u gjet" });
       }
       return res.status(200).json(product);
-    } catch (error) {
+    } catch {
       return res.status(500).json({ message: "Gabim ne server" });
     }
   }
 
-  // PUT dhe DELETE kerkojne admin
+  // PUT dhe DELETE kerkojne autorizim
   const session = await getServerSession(req, res, authOptions);
   if (!session) {
     return res.status(401).json({ message: "Pa autorizim" });
   }
-  if (session.user.role !== "admin") {
-    return res.status(403).json({ message: "Vetëm adminët" });
+
+  // Verifiko qe useri eshte pronar i produktit ose admin
+  const product = await Product.findById(id);
+  if (!product) {
+    return res.status(404).json({ message: "Produkti nuk u gjet" });
+  }
+
+  const isOwner = product.createdBy?.toString() === session.user.id;
+  const isAdmin = session.user.role === "admin";
+
+  if (!isOwner && !isAdmin) {
+    return res
+      .status(403)
+      .json({ message: "Nuk ke leje të ndryshosh këtë produkt" });
   }
 
   // PUT - update
@@ -46,11 +58,8 @@ export default async function handler(
         new: true,
         runValidators: true,
       });
-      if (!updated) {
-        return res.status(404).json({ message: "Produkti nuk u gjet" });
-      }
       return res.status(200).json(updated);
-    } catch (error) {
+    } catch {
       return res.status(500).json({ message: "Gabim ne update" });
     }
   }
@@ -58,12 +67,9 @@ export default async function handler(
   // DELETE
   if (req.method === "DELETE") {
     try {
-      const deleted = await Product.findByIdAndDelete(id);
-      if (!deleted) {
-        return res.status(404).json({ message: "Produkti nuk u gjet" });
-      }
+      await Product.findByIdAndDelete(id);
       return res.status(200).json({ message: "Produkti u fshi" });
-    } catch (error) {
+    } catch {
       return res.status(500).json({ message: "Gabim ne fshirje" });
     }
   }

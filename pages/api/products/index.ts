@@ -10,10 +10,17 @@ export default async function handler(
 ) {
   await dbConnect();
 
-  // GET - kthen te gjitha produktet (publik)
+  // GET - kthen produktet (me filter opsional)
   if (req.method === "GET") {
     try {
-      const products = await Product.find({}).sort({ createdAt: -1 }).lean();
+      const { createdBy } = req.query;
+
+      // Nese ka createdBy, filtro vetem produktet e atij useri
+      const filter = createdBy ? { createdBy: createdBy as string } : {};
+      const products = await Product.find(filter)
+        .sort({ createdAt: -1 })
+        .lean();
+
       return res.status(200).json(products);
     } catch (error) {
       const message = error instanceof Error ? error.message : "Gabim";
@@ -23,14 +30,18 @@ export default async function handler(
     }
   }
 
-  // POST - krijim i ri (vetem admin)
+  // POST - krijim i ri (seller + admin)
   if (req.method === "POST") {
     const session = await getServerSession(req, res, authOptions);
     if (!session) {
       return res.status(401).json({ message: "Pa autorizim" });
     }
-    if (session.user.role !== "admin") {
-      return res.status(403).json({ message: "Vetëm adminët" });
+    if (session.user.role !== "seller" && session.user.role !== "admin") {
+      return res
+        .status(403)
+        .json({
+          message: "Vetëm shitësit dhe adminët mund të shtojnë produkte",
+        });
     }
 
     try {
