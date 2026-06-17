@@ -8,6 +8,8 @@ export default function Footer() {
         {/* Logo origjinale */}
         <div className="mb-8 lg:mb-12">
           <img
+            loading="lazy"
+            decoding="async"
             src={FIGMA.logo}
             alt="Paradox Tech"
             className="w-16 h-16 sm:w-20 sm:h-20 object-contain"

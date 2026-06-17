@@ -596,6 +596,8 @@ const Profile: NextPage = () => {
                         {imagePreview && (
                           <div className="mb-3 relative inline-block">
                             <img
+                              loading="lazy"
+                              decoding="async"
                               src={imagePreview}
                               alt="Preview"
                               className="w-32 h-32 object-cover rounded-lg border-2 border-[#cf35d2]/50"
@@ -728,6 +730,8 @@ const Profile: NextPage = () => {
                       >
                         <div className="aspect-square bg-white/5 overflow-hidden">
                           <img
+                            loading="lazy"
+                            decoding="async"
                             src={product.image || "/images/placeholder.svg"}
                             alt={product.title}
                             className="w-full h-full object-cover"

@@ -14,6 +14,8 @@ export default function Header() {
         {/* Logo */}
         <Link href="/" className="flex items-center shrink-0">
           <img
+            loading="eager"
+            decoding="async"
             src={FIGMA.logo}
             alt="Paradox Tech"
             className="w-12 h-12 sm:w-16 sm:h-16 lg:w-20 lg:h-20 object-contain"

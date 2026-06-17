@@ -63,6 +63,8 @@ const ProductDetails: NextPage = () => {
                       className="bg-white aspect-square overflow-hidden border border-transparent hover:border-[#cf35d2] transition"
                     >
                       <img
+                        loading="lazy"
+                        decoding="async"
                         src={image}
                         alt={`Product thumbnail ${index + 1}`}
                         className="w-full h-full object-cover"
@@ -73,6 +75,9 @@ const ProductDetails: NextPage = () => {
 
                 <div className="bg-white aspect-square flex items-center justify-center overflow-hidden">
                   <img
+                    loading="eager"
+                    fetchPriority="high"
+                    decoding="async"
                     src={FIGMA.productHeadsetPink}
                     alt="Logitech G Pro X Lightspeed Pink Headset"
                     className="w-full h-full object-cover"
@@ -147,8 +152,8 @@ const ProductDetails: NextPage = () => {
 
                   <p className="text-sm leading-relaxed text-[#ececec]/70 max-w-xl">
                     Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-                    Suspendisse pellentesque sem tellus adipiscing elit. Consequat
-                    dolor odio odio malesuada at condimentum.
+                    Suspendisse pellentesque sem tellus adipiscing elit.
+                    Consequat dolor odio odio malesuada at condimentum.
                   </p>
                 </div>
               </div>
@@ -173,9 +178,15 @@ const ProductDetails: NextPage = () => {
 
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
                 {relatedProducts.map((product, index) => (
-                  <Link href="/shop/product" key={index} className="group text-center">
+                  <Link
+                    href="/shop/product"
+                    key={index}
+                    className="group text-center"
+                  >
                     <div className="bg-white aspect-square overflow-hidden mb-4">
                       <img
+                        loading="lazy"
+                        decoding="async"
                         src={product.image}
                         alt={product.name}
                         className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"

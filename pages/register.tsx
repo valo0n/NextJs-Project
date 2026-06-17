@@ -68,6 +68,8 @@ const Register: NextPage = () => {
           className="absolute top-6 left-6 lg:top-8 lg:left-12 z-20"
         >
           <img
+            loading="eager"
+            decoding="async"
             src={FIGMA.logo}
             alt="Paradox Tech"
             className="w-14 h-14 lg:w-16 lg:h-16 object-contain"

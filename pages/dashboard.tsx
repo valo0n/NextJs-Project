@@ -90,6 +90,8 @@ const Dashboard: NextPage = () => {
             <div className="p-6 border-b border-white/10">
               <Link href="/" className="flex items-center gap-3">
                 <img
+                  loading="eager"
+                  decoding="async"
                   src={FIGMA.logo}
                   alt="Paradox"
                   className="w-10 h-10 object-contain"
@@ -540,6 +542,8 @@ function ProductsTab() {
                 >
                   <td className="px-6 py-4">
                     <img
+                      loading="lazy"
+                      decoding="async"
                       src={
                         p.image ||
                         "https://placehold.co/60x60/1a1a3a/cf35d2?text=?"

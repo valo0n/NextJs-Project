@@ -40,6 +40,9 @@ const About: NextPage = () => {
             >
               {/* Left illustration - 3D laptop */}
               <img
+                loading="eager"
+                fetchPriority="high"
+                decoding="async"
                 src={FIGMA.aboutLeft}
                 alt="Laptop illustration"
                 className="absolute left-2 sm:left-6 bottom-2 sm:bottom-6 w-32 sm:w-48 lg:w-64 object-contain z-10 pointer-events-none"
@@ -47,6 +50,9 @@ const About: NextPage = () => {
 
               {/* Right illustration - 3D shopping cart */}
               <img
+                loading="eager"
+                fetchPriority="high"
+                decoding="async"
                 src={FIGMA.aboutRight}
                 alt="Shopping illustration"
                 className="absolute right-2 sm:right-6 bottom-2 sm:bottom-6 w-32 sm:w-48 lg:w-72 object-contain z-10 pointer-events-none"
@@ -96,6 +102,8 @@ const About: NextPage = () => {
         {/* VIDEO SECTION - 3D app icons background */}
         <section className="relative h-64 sm:h-96 lg:h-[450px] overflow-hidden">
           <img
+            loading="lazy"
+            decoding="async"
             src={FIGMA.aboutVideoBg}
             alt="Video section"
             className="absolute inset-0 w-full h-full object-cover"
@@ -201,6 +209,8 @@ const About: NextPage = () => {
                   {/* Image me sfond te bardhe si ne Figma */}
                   <div className="bg-white overflow-hidden mb-6">
                     <img
+                      loading="lazy"
+                      decoding="async"
                       src={post.image}
                       alt={post.title}
                       className="w-full h-[200px] sm:h-[250px] object-contain p-4 group-hover:scale-105 transition-transform duration-500"

@@ -16,8 +16,16 @@ interface HomeProduct {
   category?: string;
 }
 
+// Kategori e shfaqur ne seksionet showcase (Chairs/Table/Lamps) - vjen nga DB
+interface FeaturedCategory {
+  name: string;
+  image: string; // foto e nje produkti perfaqesues te kategorise
+  count: number; // sa produkte ka kjo kategori
+}
+
 interface HomeProps {
   products: HomeProduct[];
+  featuredCategories: FeaturedCategory[];
 }
 
 // Buton "View more" sipas dizajnit (border simple)
@@ -45,7 +53,77 @@ function ViewMoreButton({ href = "/shop" }: { href?: string }) {
   );
 }
 
-const Home: NextPage<HomeProps> = ({ products }) => {
+// Seksion showcase i ripërdorshëm - merr të dhënat nga DB (kategori)
+// reverse=true e vendos foton majtas (si seksioni TABLE ne dizajnin origjinal)
+function ShowcaseSection({
+  title,
+  description,
+  image,
+  href,
+  reverse = false,
+}: {
+  title: string;
+  description: string;
+  image: string;
+  href: string;
+  reverse?: boolean;
+}) {
+  const corners = reverse
+    ? "rounded-tr-[80px] rounded-bl-[80px] rounded-br-[80px]"
+    : "rounded-tl-[80px] rounded-tr-[80px] rounded-bl-[80px]";
+
+  return (
+    <section className="py-16 sm:py-20 lg:py-24 px-6 relative overflow-hidden">
+      <div
+        className={`absolute top-1/2 ${reverse ? "left-[5%]" : "right-[10%]"} w-[400px] h-[400px] rounded-full bg-paradox-purple/15 blur-[100px] pointer-events-none`}
+      />
+
+      <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-16 items-center relative z-10">
+        {/* Foto */}
+        <div className={`relative ${reverse ? "order-2 lg:order-1" : ""}`}>
+          <div
+            className={`border-[3px] border-[#cf35d2] ${corners} overflow-hidden aspect-square`}
+          >
+            <img
+              src={image}
+              alt={title}
+              loading="lazy"
+              decoding="async"
+              className={`w-full h-full object-cover ${corners}`}
+            />
+          </div>
+        </div>
+
+        {/* Teksti */}
+        <div
+          className={`${reverse ? "order-1 lg:order-2 text-center lg:text-left" : ""}`}
+        >
+          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold mb-6 tracking-wider uppercase">
+            {title}
+          </h2>
+          <p
+            className={`text-[#ececec] mb-8 leading-relaxed text-base lg:text-lg max-w-md ${reverse ? "mx-auto lg:mx-0" : ""}`}
+          >
+            {description}
+          </p>
+          <ViewMoreButton href={href} />
+        </div>
+      </div>
+    </section>
+  );
+}
+
+// Fallback statik - shfaqet vetëm nëse DB s'ka kategori (që mos prishet pamja)
+const FALLBACK_SHOWCASE: FeaturedCategory[] = [
+  { name: "Stylish Chairs", image: FIGMA.chair, count: 0 },
+  { name: "Table", image: FIGMA.table, count: 0 },
+  { name: "Contemporary Lamps", image: FIGMA.lamp, count: 0 },
+];
+
+const Home: NextPage<HomeProps> = ({ products, featuredCategories }) => {
+  // nëse DB s'ktheu kategori, përdor dizajnin origjinal
+  const showcase =
+    featuredCategories.length > 0 ? featuredCategories : FALLBACK_SHOWCASE;
   return (
     <>
       <Head>
@@ -65,6 +143,9 @@ const Home: NextPage<HomeProps> = ({ products }) => {
               <img
                 src={FIGMA.giveShop}
                 alt="Shopping Bag"
+                loading="eager"
+                fetchPriority="high"
+                decoding="async"
                 className="
                   hidden lg:block
                   absolute left-0 top-1/2 -translate-y-1/2
@@ -77,6 +158,9 @@ const Home: NextPage<HomeProps> = ({ products }) => {
                 <img
                   src={FIGMA.giveShop}
                   alt="Shopping Bag"
+                  loading="eager"
+                  fetchPriority="high"
+                  decoding="async"
                   className="w-56 sm:w-72 object-contain"
                 />
               </div>
@@ -140,6 +224,8 @@ const Home: NextPage<HomeProps> = ({ products }) => {
                       <img
                         src={product.image || FIGMA.productMouse}
                         alt={product.title}
+                        loading="lazy"
+                        decoding="async"
                         className="w-full h-full object-cover"
                       />
                     </div>
@@ -172,6 +258,8 @@ const Home: NextPage<HomeProps> = ({ products }) => {
           <img
             src={FIGMA.videoBg}
             alt="Studio Setup"
+            loading="lazy"
+            decoding="async"
             className="absolute inset-0 w-full h-full object-cover"
           />
           <div className="absolute inset-0 bg-black/40" />
@@ -191,90 +279,21 @@ const Home: NextPage<HomeProps> = ({ products }) => {
           </div>
         </section>
 
-        {/* STYLISH CHAIRS SECTION */}
-        <section className="py-16 sm:py-20 lg:py-24 px-6 relative overflow-hidden">
-          <div className="absolute top-1/2 right-[10%] w-[400px] h-[400px] rounded-full bg-paradox-purple/15 blur-[100px] pointer-events-none" />
-
-          <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-16 items-center relative z-10">
-            <div>
-              <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold mb-6 tracking-wider uppercase">
-                stylish chairs
-              </h2>
-              <p className="text-[#ececec] mb-8 leading-relaxed text-base lg:text-lg max-w-md">
-                Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-                Consequat dolor odio odio malesuada at condimentum adipiscing
-                iaculis semper.
-              </p>
-              <ViewMoreButton />
-            </div>
-            <div className="relative">
-              {/* Border me kornize asimetrike si ne Figma (3 corners rounded) */}
-              <div className="border-[3px] border-[#cf35d2] rounded-tl-[80px] rounded-tr-[80px] rounded-bl-[80px] overflow-hidden aspect-square">
-                <img
-                  src={FIGMA.chair}
-                  alt="Gaming Chair"
-                  className="w-full h-full object-cover rounded-tl-[80px] rounded-tr-[80px] rounded-bl-[80px]"
-                />
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* TABLE SECTION */}
-        <section className="py-16 sm:py-20 lg:py-24 px-6 relative overflow-hidden">
-          <div className="absolute top-1/2 left-[5%] w-[400px] h-[400px] rounded-full bg-paradox-purple/15 blur-[100px] pointer-events-none" />
-
-          <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-16 items-center relative z-10">
-            <div className="relative order-2 lg:order-1">
-              <div className="border-[3px] border-[#cf35d2] rounded-tr-[80px] rounded-bl-[80px] rounded-br-[80px] overflow-hidden aspect-square">
-                <img
-                  src={FIGMA.table}
-                  alt="Gaming Desk"
-                  className="w-full h-full object-cover rounded-tr-[80px] rounded-bl-[80px] rounded-br-[80px]"
-                />
-              </div>
-            </div>
-            <div className="order-1 lg:order-2 text-center lg:text-left">
-              <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold mb-6 tracking-wider uppercase">
-                Table
-              </h2>
-              <p className="text-[#ececec] mb-8 leading-relaxed text-base lg:text-lg max-w-md mx-auto lg:mx-0">
-                Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-                Consequat dolor odio odio malesuada at condimentum adipiscing
-                iaculis semper.
-              </p>
-              <ViewMoreButton />
-            </div>
-          </div>
-        </section>
-
-        {/* CONTEMPORARY LAMPS SECTION */}
-        <section className="py-16 sm:py-20 lg:py-24 px-6 relative overflow-hidden">
-          <div className="absolute top-1/2 right-[10%] w-[400px] h-[400px] rounded-full bg-paradox-purple/15 blur-[100px] pointer-events-none" />
-
-          <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-16 items-center relative z-10">
-            <div>
-              <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold mb-6 tracking-wider uppercase">
-                contemporary lamps
-              </h2>
-              <p className="text-[#ececec] mb-8 leading-relaxed text-base lg:text-lg max-w-md">
-                Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-                Consequat dolor odio odio malesuada at condimentum adipiscing
-                iaculis semper.
-              </p>
-              <ViewMoreButton />
-            </div>
-            <div className="relative">
-              <div className="border-[3px] border-[#cf35d2] rounded-tl-[80px] rounded-tr-[80px] rounded-bl-[80px] overflow-hidden aspect-square">
-                <img
-                  src={FIGMA.lamp}
-                  alt="Studio Setup with Lamps"
-                  className="w-full h-full object-cover rounded-tl-[80px] rounded-tr-[80px] rounded-bl-[80px]"
-                />
-              </div>
-            </div>
-          </div>
-        </section>
+        {/* SHOWCASE SECTIONS - kategoritë vijnë nga DB (alternohet majtas/djathtas) */}
+        {showcase.map((cat, i) => (
+          <ShowcaseSection
+            key={cat.name}
+            title={cat.name}
+            description={
+              cat.count > 0
+                ? `Eksploro ${cat.count} produkte në kategorinë ${cat.name}. Cilësi premium, çmime konkurruese.`
+                : "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Consequat dolor odio odio malesuada at condimentum adipiscing iaculis semper."
+            }
+            image={cat.image}
+            href={`/shop?category=${encodeURIComponent(cat.name)}`}
+            reverse={i % 2 === 1}
+          />
+        ))}
 
         {/* DELIVERY BANNER */}
         <section className="py-12 lg:py-16 bg-[#0f0f0f]">
@@ -333,6 +352,8 @@ const Home: NextPage<HomeProps> = ({ products }) => {
                 <img
                   src={FIGMA.person1}
                   alt="Team member 1"
+                  loading="lazy"
+                  decoding="async"
                   className="w-full h-full object-cover mix-blend-luminosity opacity-90"
                 />
               </div>
@@ -346,6 +367,8 @@ const Home: NextPage<HomeProps> = ({ products }) => {
                 <img
                   src={FIGMA.person2}
                   alt="Team member 2"
+                  loading="lazy"
+                  decoding="async"
                   className="w-full h-full object-cover mix-blend-luminosity opacity-90"
                 />
               </div>
@@ -362,11 +385,13 @@ export default Home;
 // SSG + ISR - faqja generohet ne build dhe rifreskohet automatikisht cdo 60s
 export const getStaticProps: GetStaticProps<HomeProps> = async () => {
   let products: HomeProduct[] = [];
+  let featuredCategories: FeaturedCategory[] = [];
 
   try {
     if (process.env.MONGODB_URI) {
       await dbConnect();
       const docs = await Product.find({}).sort({ createdAt: -1 }).lean();
+
       products = docs.map((p) => ({
         _id: p._id.toString(),
         title: p.title,
@@ -375,6 +400,25 @@ export const getStaticProps: GetStaticProps<HomeProps> = async () => {
         image: p.image,
         category: p.category,
       }));
+
+      // Grupo produktet sipas kategorise -> nxjerr deri ne 3 kategori per showcase
+      const map = new Map<string, FeaturedCategory>();
+      for (const p of docs) {
+        const name = (p.category || "").trim();
+        if (!name) continue;
+        const existing = map.get(name);
+        if (existing) {
+          existing.count += 1;
+        } else {
+          // docs jane te renditura nga me i riu -> foto e produktit me te ri
+          map.set(name, {
+            name,
+            image: p.image || FIGMA.productMouse,
+            count: 1,
+          });
+        }
+      }
+      featuredCategories = Array.from(map.values()).slice(0, 3);
     }
   } catch (error) {
     console.error("Gabim ne getStaticProps:", error);
@@ -382,7 +426,7 @@ export const getStaticProps: GetStaticProps<HomeProps> = async () => {
   }
 
   return {
-    props: { products },
+    props: { products, featuredCategories },
     // ISR - rifresko faqen cdo 60 sekonda
     revalidate: 60,
   };

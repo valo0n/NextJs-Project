@@ -119,6 +119,8 @@ const Shop: NextPage = () => {
                             </span>
                             <div className="bg-white aspect-square overflow-hidden mb-4 flex items-center justify-center">
                               <img
+                                loading="lazy"
+                                decoding="async"
                                 src={product.image}
                                 alt={product.title}
                                 className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
@@ -169,6 +171,8 @@ const Shop: NextPage = () => {
                       <Link href="/shop/logitech-g-pro-x">
                         <div className="bg-white aspect-square overflow-hidden mb-4 flex items-center justify-center">
                           <img
+                            loading="lazy"
+                            decoding="async"
                             src={product.image}
                             alt={product.name}
                             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"

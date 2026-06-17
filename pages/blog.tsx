@@ -70,6 +70,8 @@ const Blog: NextPage = () => {
                   <article key={post.id} className="group">
                     <div className="mb-6 overflow-hidden rounded-lg border border-white/10">
                       <img
+                        loading="lazy"
+                        decoding="async"
                         src={post.image}
                         alt={post.title}
                         className="w-full aspect-video object-cover group-hover:scale-105 transition-transform duration-500"
@@ -154,6 +156,8 @@ const Blog: NextPage = () => {
                   <h3 className="font-bold text-lg mb-4">Recent post</h3>
                   <div className="flex gap-3 group cursor-pointer">
                     <img
+                      loading="lazy"
+                      decoding="async"
                       src={FIGMA.productKeyboard1}
                       alt="Recent post"
                       className="w-20 h-20 object-cover rounded opacity-80 group-hover:opacity-100 transition"
