@@ -144,7 +144,6 @@ const Home: NextPage<HomeProps> = ({ products, featuredCategories }) => {
                 src={FIGMA.giveShop}
                 alt="Shopping Bag"
                 loading="eager"
-                fetchPriority="high"
                 decoding="async"
                 className="
                   hidden lg:block
@@ -159,7 +158,6 @@ const Home: NextPage<HomeProps> = ({ products, featuredCategories }) => {
                   src={FIGMA.giveShop}
                   alt="Shopping Bag"
                   loading="eager"
-                  fetchPriority="high"
                   decoding="async"
                   className="w-56 sm:w-72 object-contain"
                 />

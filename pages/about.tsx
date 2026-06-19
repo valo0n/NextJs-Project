@@ -1,8 +1,21 @@
 import Layout from "@/components/Layout";
 import Head from "next/head";
 import Link from "next/link";
-import { NextPage } from "next";
+import { GetStaticProps, NextPage } from "next";
 import { FIGMA } from "@/lib/figmaAssets";
+import { dbConnect } from "@/lib/dbConnect";
+import BlogPost from "@/models/BlogPost";
+
+interface LastPost {
+  _id: string;
+  image: string;
+  title: string;
+  desc: string;
+}
+
+interface AboutProps {
+  lastPosts: LastPost[];
+}
 
 function ReadMoreButton({ href = "/" }: { href?: string }) {
   return (
@@ -15,7 +28,7 @@ function ReadMoreButton({ href = "/" }: { href?: string }) {
   );
 }
 
-const About: NextPage = () => {
+const About: NextPage<AboutProps> = ({ lastPosts }) => {
   return (
     <>
       <Head>
@@ -41,7 +54,6 @@ const About: NextPage = () => {
               {/* Left illustration - 3D laptop */}
               <img
                 loading="eager"
-                fetchPriority="high"
                 decoding="async"
                 src={FIGMA.aboutLeft}
                 alt="Laptop illustration"
@@ -51,7 +63,6 @@ const About: NextPage = () => {
               {/* Right illustration - 3D shopping cart */}
               <img
                 loading="eager"
-                fetchPriority="high"
                 decoding="async"
                 src={FIGMA.aboutRight}
                 alt="Shopping illustration"
@@ -188,52 +199,74 @@ const About: NextPage = () => {
             </h2>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 lg:gap-12">
-              {[
-                {
-                  image: FIGMA.laptopRazer,
-                  title: "Razer Blade 14 Gaming Laptop",
-                  desc: "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
-                },
-                {
-                  image: FIGMA.laptopAsus,
-                  title: 'ASUS Zenbook 15 OLED 15.6" Laptop',
-                  desc: "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
-                },
-                {
-                  image: FIGMA.laptopAcer,
-                  title: "Nitro 5 Gaming Laptop",
-                  desc: "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
-                },
-              ].map((post, index) => (
-                <div key={index} className="text-center group">
-                  {/* Image me sfond te bardhe si ne Figma */}
-                  <div className="bg-white overflow-hidden mb-6">
-                    <img
-                      loading="lazy"
-                      decoding="async"
-                      src={post.image}
-                      alt={post.title}
-                      className="w-full h-[200px] sm:h-[250px] object-contain p-4 group-hover:scale-105 transition-transform duration-500"
-                    />
+              {lastPosts.length === 0 ? (
+                <p className="text-gray-400 col-span-full">
+                  S'ka ende poste blogu.{" "}
+                  <a
+                    href="/api/blog/seed"
+                    className="text-paradox-purple underline"
+                  >
+                    Mbilli te /api/blog/seed
+                  </a>
+                  .
+                </p>
+              ) : (
+                lastPosts.map((post) => (
+                  <div key={post._id} className="text-center group">
+                    {/* Image me sfond te bardhe si ne Figma */}
+                    <div className="bg-white overflow-hidden mb-6">
+                      <img
+                        loading="lazy"
+                        decoding="async"
+                        src={post.image}
+                        alt={post.title}
+                        className="w-full h-[200px] sm:h-[250px] object-contain p-4 group-hover:scale-105 transition-transform duration-500"
+                      />
+                    </div>
+
+                    <h3 className="text-white text-base lg:text-lg font-medium mb-3 px-2">
+                      {post.title}
+                    </h3>
+
+                    <p className="text-gray-400 text-sm mb-4 px-4 leading-relaxed">
+                      {post.desc}
+                    </p>
+
+                    <ReadMoreButton />
                   </div>
-
-                  <h3 className="text-white text-base lg:text-lg font-medium mb-3 px-2">
-                    {post.title}
-                  </h3>
-
-                  <p className="text-gray-400 text-sm mb-4 px-4 leading-relaxed">
-                    {post.desc}
-                  </p>
-
-                  <ReadMoreButton />
-                </div>
-              ))}
+                ))
+              )}
             </div>
           </div>
         </section>
       </Layout>
     </>
   );
+};
+
+export const getStaticProps: GetStaticProps<AboutProps> = async () => {
+  let lastPosts: LastPost[] = [];
+
+  try {
+    if (process.env.MONGODB_URI) {
+      await dbConnect();
+      const docs = await BlogPost.find({})
+        .sort({ createdAt: -1 })
+        .limit(3)
+        .lean();
+
+      lastPosts = docs.map((p) => ({
+        _id: p._id.toString(),
+        image: p.image || "",
+        title: p.title,
+        desc: p.excerpt,
+      }));
+    }
+  } catch (error) {
+    console.error("Gabim ne getStaticProps (about):", error);
+  }
+
+  return { props: { lastPosts }, revalidate: 60 };
 };
 
 export default About;

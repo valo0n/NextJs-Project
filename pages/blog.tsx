@@ -1,49 +1,33 @@
 import Layout from "@/components/Layout";
 import Head from "next/head";
 import Link from "next/link";
-import { NextPage } from "next";
-import { FIGMA } from "@/lib/figmaAssets";
+import { GetStaticProps, NextPage } from "next";
+import { dbConnect } from "@/lib/dbConnect";
+import BlogPost from "@/models/BlogPost";
 
-const Blog: NextPage = () => {
-  const categories = [
-    { name: "Acer", count: 23 },
-    { name: "Monitor", count: 18 },
-    { name: "Led", count: 22 },
-    { name: "Mouse", count: 21 },
-    { name: "Mouse Pad", count: 25 },
-    { name: "HDMI", count: 13 },
-  ];
+interface BlogPostView {
+  _id: string;
+  title: string;
+  excerpt: string;
+  image: string;
+  category: string;
+  author: string;
+  comments: number;
+  date: string;
+}
 
-  const posts = [
-    {
-      id: 1,
-      title: "Logitech's latest keyboard has arrived",
-      date: "Sep 20, 2022",
-      category: "Keyboard",
-      author: "Admin-art",
-      comments: 0,
-      image: FIGMA.blog1,
-    },
-    {
-      id: 2,
-      title: "New Logitech keyboard out now!",
-      date: "Sep 20, 2022",
-      category: "Keyboard",
-      author: "Admin-art",
-      comments: 0,
-      image: FIGMA.blog2,
-    },
-    {
-      id: 3,
-      title: "New Logitech keyboard released!",
-      date: "Sep 20, 2022",
-      category: "Keyboard",
-      author: "Admin-art",
-      comments: 0,
-      image: FIGMA.blog3,
-    },
-  ];
+interface CategoryView {
+  name: string;
+  count: number;
+}
 
+interface BlogProps {
+  posts: BlogPostView[];
+  categories: CategoryView[];
+  recent: BlogPostView | null;
+}
+
+const Blog: NextPage<BlogProps> = ({ posts, categories, recent }) => {
   return (
     <>
       <Head>
@@ -66,39 +50,52 @@ const Blog: NextPage = () => {
             <div className="flex flex-col lg:flex-row gap-12">
               {/* MAIN CONTENT - POSTS */}
               <div className="flex-1 space-y-16">
-                {posts.map((post) => (
-                  <article key={post.id} className="group">
-                    <div className="mb-6 overflow-hidden rounded-lg border border-white/10">
-                      <img
-                        loading="lazy"
-                        decoding="async"
-                        src={post.image}
-                        alt={post.title}
-                        className="w-full aspect-video object-cover group-hover:scale-105 transition-transform duration-500"
-                      />
-                    </div>
-                    <div className="flex flex-wrap items-center gap-2 sm:gap-4 text-xs text-gray-400 mb-4">
-                      <span>{post.date}</span>
-                      <span className="w-1 h-1 bg-gray-600 rounded-full"></span>
-                      <span>Modern, House, {post.category}</span>
-                      <span className="w-1 h-1 bg-gray-600 rounded-full"></span>
-                      <span>By {post.author}</span>
-                      <span className="w-1 h-1 bg-gray-600 rounded-full"></span>
-                      <span>💬 {post.comments}</span>
-                    </div>
-                    <h2 className="text-2xl sm:text-3xl font-bold mb-4 hover:text-paradox-purple transition cursor-pointer">
-                      {post.title}
-                    </h2>
-                    <p className="text-gray-400 leading-relaxed mb-6">
-                      Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-                      Suspendisse massa libero, mattis volutpat id. Egestas
-                      adipiscing placerat eleifend a nascetur.
+                {posts.length === 0 ? (
+                  <div className="text-center py-20 border border-white/10 rounded-lg">
+                    <p className="text-gray-400 mb-4">
+                      S'ka ende poste blogu në databazë.
                     </p>
-                    <button className="text-paradox-purple hover:text-paradox-pink transition text-sm underline-offset-4 hover:underline">
-                      Read more →
-                    </button>
-                  </article>
-                ))}
+                    <a
+                      href="/api/blog/seed"
+                      className="text-paradox-purple underline"
+                    >
+                      Kliko këtu për t'i mbjellë postet fillestare
+                      (/api/blog/seed)
+                    </a>
+                  </div>
+                ) : (
+                  posts.map((post) => (
+                    <article key={post._id} className="group">
+                      <div className="mb-6 overflow-hidden rounded-lg border border-white/10">
+                        <img
+                          loading="lazy"
+                          decoding="async"
+                          src={post.image}
+                          alt={post.title}
+                          className="w-full aspect-video object-cover group-hover:scale-105 transition-transform duration-500"
+                        />
+                      </div>
+                      <div className="flex flex-wrap items-center gap-2 sm:gap-4 text-xs text-gray-400 mb-4">
+                        <span>{post.date}</span>
+                        <span className="w-1 h-1 bg-gray-600 rounded-full"></span>
+                        <span>Modern, House, {post.category}</span>
+                        <span className="w-1 h-1 bg-gray-600 rounded-full"></span>
+                        <span>By {post.author}</span>
+                        <span className="w-1 h-1 bg-gray-600 rounded-full"></span>
+                        <span>💬 {post.comments}</span>
+                      </div>
+                      <h2 className="text-2xl sm:text-3xl font-bold mb-4 hover:text-paradox-purple transition cursor-pointer">
+                        {post.title}
+                      </h2>
+                      <p className="text-gray-400 leading-relaxed mb-6">
+                        {post.excerpt}
+                      </p>
+                      <button className="text-paradox-purple hover:text-paradox-pink transition text-sm underline-offset-4 hover:underline">
+                        Read more →
+                      </button>
+                    </article>
+                  ))
+                )}
 
                 {/* Comment Form */}
                 <div className="mt-20 border-t border-white/10 pt-12">
@@ -151,45 +148,51 @@ const Blog: NextPage = () => {
                   />
                 </div>
 
-                {/* Recent Post Widget */}
-                <div>
-                  <h3 className="font-bold text-lg mb-4">Recent post</h3>
-                  <div className="flex gap-3 group cursor-pointer">
-                    <img
-                      loading="lazy"
-                      decoding="async"
-                      src={FIGMA.productKeyboard1}
-                      alt="Recent post"
-                      className="w-20 h-20 object-cover rounded opacity-80 group-hover:opacity-100 transition"
-                    />
-                    <div>
-                      <p className="text-sm font-medium group-hover:text-paradox-purple transition">
-                        Logitech's latest keyboard
-                      </p>
-                      <p className="text-xs text-gray-400 mt-1">Sep 20, 2022</p>
+                {/* Recent Post Widget - nga DB */}
+                {recent && (
+                  <div>
+                    <h3 className="font-bold text-lg mb-4">Recent post</h3>
+                    <div className="flex gap-3 group cursor-pointer">
+                      <img
+                        loading="lazy"
+                        decoding="async"
+                        src={recent.image}
+                        alt={recent.title}
+                        className="w-20 h-20 object-cover rounded opacity-80 group-hover:opacity-100 transition"
+                      />
+                      <div>
+                        <p className="text-sm font-medium group-hover:text-paradox-purple transition">
+                          {recent.title}
+                        </p>
+                        <p className="text-xs text-gray-400 mt-1">
+                          {recent.date}
+                        </p>
+                      </div>
                     </div>
                   </div>
-                </div>
+                )}
 
-                {/* Categories */}
-                <div>
-                  <h3 className="font-bold text-lg mb-4">Categories</h3>
-                  <ul className="space-y-3">
-                    {categories.map((cat) => (
-                      <li key={cat.name}>
-                        <Link
-                          href="#"
-                          className="flex justify-between items-center text-gray-300 hover:text-white transition"
-                        >
-                          <span>{cat.name}</span>
-                          <span className="text-gray-500 text-sm">
-                            ({cat.count})
-                          </span>
-                        </Link>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
+                {/* Categories - nga DB */}
+                {categories.length > 0 && (
+                  <div>
+                    <h3 className="font-bold text-lg mb-4">Categories</h3>
+                    <ul className="space-y-3">
+                      {categories.map((cat) => (
+                        <li key={cat.name}>
+                          <Link
+                            href="#"
+                            className="flex justify-between items-center text-gray-300 hover:text-white transition"
+                          >
+                            <span>{cat.name}</span>
+                            <span className="text-gray-500 text-sm">
+                              ({cat.count})
+                            </span>
+                          </Link>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
               </aside>
             </div>
           </div>
@@ -197,6 +200,54 @@ const Blog: NextPage = () => {
       </Layout>
     </>
   );
+};
+
+function fmtDate(d: Date): string {
+  return new Date(d).toLocaleDateString("en-US", {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+  });
+}
+
+export const getStaticProps: GetStaticProps<BlogProps> = async () => {
+  let posts: BlogPostView[] = [];
+  let categories: CategoryView[] = [];
+  let recent: BlogPostView | null = null;
+
+  try {
+    if (process.env.MONGODB_URI) {
+      await dbConnect();
+      const docs = await BlogPost.find({}).sort({ createdAt: -1 }).lean();
+
+      posts = docs.map((p) => ({
+        _id: p._id.toString(),
+        title: p.title,
+        excerpt: p.excerpt,
+        image: p.image || "",
+        category: p.category,
+        author: p.author,
+        comments: p.comments ?? 0,
+        date: fmtDate(p.createdAt),
+      }));
+
+      // Kategorite e grupuara me numra
+      const map = new Map<string, number>();
+      for (const p of posts) {
+        map.set(p.category, (map.get(p.category) || 0) + 1);
+      }
+      categories = Array.from(map.entries()).map(([name, count]) => ({
+        name,
+        count,
+      }));
+
+      recent = posts[0] || null;
+    }
+  } catch (error) {
+    console.error("Gabim ne getStaticProps (blog):", error);
+  }
+
+  return { props: { posts, categories, recent }, revalidate: 60 };
 };
 
 export default Blog;
