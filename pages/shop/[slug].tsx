@@ -7,7 +7,7 @@ import { useEffect, useState } from "react";
 
 const ProductDetails: NextPage = () => {
   const router = useRouter();
-  const { id } = router.query;
+  const { slug } = router.query;
 
   const [product, setProduct] = useState<any>(null);
   const [related, setRelated] = useState<any[]>([]);
@@ -18,11 +18,15 @@ const ProductDetails: NextPage = () => {
   // FETCH SINGLE PRODUCT
   // ----------------------------
   useEffect(() => {
-    if (!id) return;
+    if (!slug) return;
 
     const fetchProduct = async () => {
       try {
-        const res = await fetch(`/api/products/${id}`);
+        const res = await fetch(`/api/products/${slug}`);
+        if (!res.ok) {
+          setProduct(null);
+          return;
+        }
         const data = await res.json();
 
         setProduct(data);
@@ -34,7 +38,7 @@ const ProductDetails: NextPage = () => {
     };
 
     fetchProduct();
-  }, [id]);
+  }, [slug]);
 
   // ----------------------------
   // FETCH RELATED PRODUCTS

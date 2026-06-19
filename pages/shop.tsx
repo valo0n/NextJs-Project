@@ -3,59 +3,25 @@
 import Layout from "@/components/Layout";
 import Head from "next/head";
 import Link from "next/link";
-import { NextPage } from "next";
-import { FIGMA } from "@/lib/figmaAssets";
+import { GetStaticProps, NextPage } from "next";
 import { useUserProducts } from "@/context/UserProductsContext";
+import { dbConnect } from "@/lib/dbConnect";
+import Product from "@/models/Product";
 
-const defaultProducts = [
-  {
-    name: "Logitech PRO X Superlight Wireless",
-    price: "$160.00",
-    image: FIGMA.productMouse,
-  },
-  {
-    name: "Logitech G203 Lightsync",
-    price: "$39.00",
-    image: FIGMA.productMouse,
-  },
-  {
-    name: "Logitech MX Master 3S Wireless",
-    price: "$99.00",
-    image: FIGMA.productMouse,
-  },
-  {
-    name: "Logitech G Pro X Wireless Gaming Headset",
-    price: "$223.00",
-    image: FIGMA.productHeadset,
-  },
-  {
-    name: "Bluetooth Gaming Headset",
-    price: "$79.00",
-    image: FIGMA.productHeadset,
-  },
-  {
-    name: "HyperX Cloud Alpha Headset",
-    price: "$89.00",
-    image: FIGMA.productHeadset,
-  },
-  {
-    name: "Logitech PRO X TKL Wireless Keyboard",
-    price: "$199.00",
-    image: FIGMA.keyboardPink,
-  },
-  {
-    name: "Logitech G PRO Mechanical Keyboard",
-    price: "$149.00",
-    image: FIGMA.keyboardBlack,
-  },
-  {
-    name: "Logitech G PRO TKL Gaming Keyboard",
-    price: "$179.00",
-    image: FIGMA.keyboardRgb,
-  },
-];
+interface ShopProduct {
+  _id: string;
+  name: string;
+  price: number;
+  image: string;
+  category: string;
+}
 
-const categories = [
+interface ShopProps {
+  products: ShopProduct[];
+  categories: string[];
+}
+
+const FALLBACK_CATEGORIES = [
   "Acer",
   "Keyboard",
   "Logitech",
@@ -64,8 +30,9 @@ const categories = [
   "Mouse",
 ];
 
-const Shop: NextPage = () => {
+const Shop: NextPage<ShopProps> = ({ products, categories }) => {
   const { products: userProducts } = useUserProducts();
+  const cats = categories.length > 0 ? categories : FALLBACK_CATEGORIES;
 
   return (
     <>
@@ -155,7 +122,7 @@ const Shop: NextPage = () => {
                   </div>
                 )}
 
-                {/* DEFAULT PRODUCTS */}
+                {/* DEFAULT PRODUCTS - nga databaza */}
                 <div className="flex justify-between items-center mb-8">
                   <h2 className="text-xl font-bold text-white">
                     Të gjitha produktet
@@ -165,35 +132,49 @@ const Shop: NextPage = () => {
                   </p>
                 </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-8">
-                  {defaultProducts.map((product, index) => (
-                    <div key={index} className="group text-center">
-                      <Link href="/shop/logitech-g-pro-x">
-                        <div className="bg-white aspect-square overflow-hidden mb-4 flex items-center justify-center">
-                          <img
-                            loading="lazy"
-                            decoding="async"
-                            src={product.image}
-                            alt={product.name}
-                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                          />
-                        </div>
+                {products.length === 0 ? (
+                  <div className="text-center py-20 border border-white/10 rounded-lg">
+                    <p className="text-gray-400 mb-4">
+                      S'ka produkte në databazë.
+                    </p>
+                    <a
+                      href="/api/seed"
+                      className="text-paradox-purple underline"
+                    >
+                      Kliko këtu për t'i mbjellë produktet (/api/seed)
+                    </a>
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-8">
+                    {products.map((product) => (
+                      <div key={product._id} className="group text-center">
+                        <Link href={`/shop/${product._id}`}>
+                          <div className="bg-white aspect-square overflow-hidden mb-4 flex items-center justify-center">
+                            <img
+                              loading="lazy"
+                              decoding="async"
+                              src={product.image}
+                              alt={product.name}
+                              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                            />
+                          </div>
 
-                        <h3 className="text-[#ececec] text-sm font-semibold leading-snug mb-2">
-                          {product.name}
-                        </h3>
+                          <h3 className="text-[#ececec] text-sm font-semibold leading-snug mb-2">
+                            {product.name}
+                          </h3>
 
-                        <div className="flex justify-center gap-1 mb-2 text-yellow-400 text-xs">
-                          ★★★★★
-                        </div>
+                          <div className="flex justify-center gap-1 mb-2 text-yellow-400 text-xs">
+                            ★★★★★
+                          </div>
 
-                        <p className="text-[#ececec] text-sm">
-                          {product.price}
-                        </p>
-                      </Link>
-                    </div>
-                  ))}
-                </div>
+                          <p className="text-[#ececec] text-sm">
+                            ${product.price.toFixed(2)}
+                          </p>
+                        </Link>
+                      </div>
+                    ))}
+                  </div>
+                )}
 
                 {/* Pagination */}
                 <div className="flex justify-center mt-12">
@@ -234,10 +215,10 @@ const Shop: NextPage = () => {
                   <h2 className="font-semibold mb-5">Category</h2>
 
                   <ul className="space-y-3 text-sm text-[#ececec]/80">
-                    {categories.map((category) => (
+                    {cats.map((category) => (
                       <li key={category}>
                         <Link
-                          href="/shop/logitech-g-pro-x"
+                          href="/shop"
                           className="hover:text-white transition"
                         >
                           {category}
@@ -283,7 +264,7 @@ const Shop: NextPage = () => {
 
             <div className="text-right mt-12">
               <Link
-                href="/shop/logitech-g-pro-x"
+                href="/shop"
                 className="text-sm text-[#ececec]/70 hover:text-white"
               >
                 view all
@@ -294,6 +275,34 @@ const Shop: NextPage = () => {
       </Layout>
     </>
   );
+};
+
+export const getStaticProps: GetStaticProps<ShopProps> = async () => {
+  let products: ShopProduct[] = [];
+  let categories: string[] = [];
+
+  try {
+    if (process.env.MONGODB_URI) {
+      await dbConnect();
+      const docs = await Product.find({}).sort({ createdAt: -1 }).lean();
+
+      products = docs.map((p) => ({
+        _id: p._id.toString(),
+        name: p.title,
+        price: p.price,
+        image: p.image || "",
+        category: p.category || "",
+      }));
+
+      categories = Array.from(
+        new Set(products.map((p) => p.category).filter(Boolean)),
+      );
+    }
+  } catch (error) {
+    console.error("Gabim ne getStaticProps (shop):", error);
+  }
+
+  return { props: { products, categories }, revalidate: 60 };
 };
 
 export default Shop;
