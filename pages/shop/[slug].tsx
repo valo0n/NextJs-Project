@@ -4,6 +4,8 @@ import Link from "next/link";
 import { NextPage } from "next";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
+import { useCart } from "@/context/CartContext";
+import { IProduct } from "@/types";
 
 const ProductDetails: NextPage = () => {
   const router = useRouter();
@@ -13,6 +15,8 @@ const ProductDetails: NextPage = () => {
   const [related, setRelated] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [quantity, setQuantity] = useState(1);
+  const { addToCart: addToCartCtx } = useCart();
+  const [added, setAdded] = useState(false);
 
   // ----------------------------
   // FETCH SINGLE PRODUCT
@@ -78,26 +82,21 @@ const ProductDetails: NextPage = () => {
   }
 
   // ----------------------------
-  // ADD TO CART (simple localStorage)
+  // ADD TO CART (përmes CartContext)
   // ----------------------------
   const addToCart = () => {
-    const cart = JSON.parse(localStorage.getItem("cart") || "[]");
-
-    cart.push({
-      productId: product._id,
-      name: product.name,
-      price: product.price,
-      image: product.image,
-      quantity,
-    });
-
-    localStorage.setItem("cart", JSON.stringify(cart));
+    // shto produktin 'quantity' herë në shportën globale
+    for (let i = 0; i < quantity; i++) {
+      addToCartCtx(product as IProduct);
+    }
+    setAdded(true);
+    setTimeout(() => setAdded(false), 2000);
   };
 
   return (
     <>
       <Head>
-        <title>{product.name}</title>
+        <title>{product.title}</title>
         <meta name="description" content={product.description} />
       </Head>
 
@@ -115,7 +114,7 @@ const ProductDetails: NextPage = () => {
               <div className="bg-white aspect-square flex items-center justify-center overflow-hidden">
                 <img
                   src={product.image}
-                  alt={product.name}
+                  alt={product.title}
                   loading="eager"
                   decoding="async"
                   className="w-full h-full object-cover"
@@ -125,7 +124,7 @@ const ProductDetails: NextPage = () => {
               {/* DETAILS */}
               <div className="text-[#ececec]">
                 <h1 className="text-xl sm:text-2xl lg:text-3xl font-semibold mb-4">
-                  {product.name}
+                  {product.title}
                 </h1>
 
                 <div className="flex items-center gap-3 mb-4">
@@ -163,9 +162,13 @@ const ProductDetails: NextPage = () => {
 
                   <button
                     onClick={addToCart}
-                    className="bg-[#ececec] text-black px-8 h-10 text-sm font-semibold hover:bg-[#cf35d2] hover:text-white"
+                    className={`px-8 h-10 text-sm font-semibold transition ${
+                      added
+                        ? "bg-green-500 text-white"
+                        : "bg-[#ececec] text-black hover:bg-[#cf35d2] hover:text-white"
+                    }`}
                   >
-                    Add to cart
+                    {added ? "Shtuar ✓" : "Add to cart"}
                   </button>
                 </div>
 
@@ -198,7 +201,7 @@ const ProductDetails: NextPage = () => {
                     <div className="bg-white aspect-square mb-4 overflow-hidden">
                       <img
                         src={item.image}
-                        alt={item.name}
+                        alt={item.title}
                         loading="lazy"
                         decoding="async"
                         className="w-full h-full object-cover"
@@ -206,7 +209,7 @@ const ProductDetails: NextPage = () => {
                     </div>
 
                     <h3 className="text-[#ececec] text-sm font-semibold mb-2">
-                      {item.name}
+                      {item.title}
                     </h3>
 
                     <p className="text-[#ececec] text-sm">${item.price}</p>

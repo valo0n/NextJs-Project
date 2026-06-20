@@ -1,12 +1,15 @@
 import Link from "next/link";
 import { useState } from "react";
 import { useSession, signOut } from "next-auth/react";
+import { useCart } from "@/context/CartContext";
 import { FIGMA } from "@/lib/figmaAssets";
 
 export default function Header() {
   const [open, setOpen] = useState<boolean>(false);
   const [userMenuOpen, setUserMenuOpen] = useState<boolean>(false);
   const { data: session } = useSession();
+  const { cart } = useCart();
+  const cartCount = cart.reduce((sum, item) => sum + item.qty, 0);
 
   return (
     <header className="absolute top-0 left-0 right-0 z-50">
@@ -177,7 +180,7 @@ export default function Header() {
           {/* Cart */}
           <Link
             href="/cart"
-            className="text-white hover:text-paradox-glow transition"
+            className="relative text-white hover:text-paradox-glow transition"
             aria-label="Cart"
           >
             <svg
@@ -193,6 +196,17 @@ export default function Header() {
                 d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"
               />
             </svg>
+            {cartCount > 0 && (
+              <span
+                className="absolute -top-2 -right-2 min-w-[18px] h-[18px] px-1 flex items-center justify-center rounded-full text-[10px] font-bold text-white"
+                style={{
+                  background:
+                    "linear-gradient(65deg, rgb(63, 50, 220) 0%, rgb(207, 53, 210) 100%)",
+                }}
+              >
+                {cartCount}
+              </span>
+            )}
           </Link>
 
           {/* Mobile menu toggle */}
