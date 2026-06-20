@@ -1,93 +1,47 @@
 import Layout from "@/components/Layout";
 import Head from "next/head";
-import Link from "next/link";
-import { NextPage } from "next";
-import { useRouter } from "next/router";
-import { useEffect, useState } from "react";
+import Card from "@/components/Card";
+import { GetStaticPaths, GetStaticProps, NextPage } from "next";
+import { useState } from "react";
+import mongoose from "mongoose";
 import { useCart } from "@/context/CartContext";
 import { IProduct } from "@/types";
+import { dbConnect } from "@/lib/dbConnect";
+import Product from "@/models/Product";
 
-const ProductDetails: NextPage = () => {
-  const router = useRouter();
-  const { slug } = router.query;
+interface PDProduct {
+  _id: string;
+  title: string;
+  description: string;
+  price: number;
+  image: string;
+  category: string;
+  stock: number;
+}
 
-  const [product, setProduct] = useState<any>(null);
-  const [related, setRelated] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
+interface RelatedProduct {
+  _id: string;
+  name: string;
+  price: number;
+  image: string;
+}
+
+interface ProductDetailsProps {
+  product: PDProduct;
+  related: RelatedProduct[];
+}
+
+const ProductDetails: NextPage<ProductDetailsProps> = ({
+  product,
+  related,
+}) => {
   const [quantity, setQuantity] = useState(1);
   const { addToCart: addToCartCtx } = useCart();
   const [added, setAdded] = useState(false);
 
-  // ----------------------------
-  // FETCH SINGLE PRODUCT
-  // ----------------------------
-  useEffect(() => {
-    if (!slug) return;
-
-    const fetchProduct = async () => {
-      try {
-        const res = await fetch(`/api/products/${slug}`);
-        if (!res.ok) {
-          setProduct(null);
-          return;
-        }
-        const data = await res.json();
-
-        setProduct(data);
-      } catch (err) {
-        console.log(err);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchProduct();
-  }, [slug]);
-
-  // ----------------------------
-  // FETCH RELATED PRODUCTS
-  // ----------------------------
-  useEffect(() => {
-    const fetchRelated = async () => {
-      try {
-        const res = await fetch("/api/products");
-        const data = await res.json();
-
-        setRelated(data.slice(0, 4));
-      } catch (err) {
-        console.log(err);
-      }
-    };
-
-    fetchRelated();
-  }, []);
-
-  // ----------------------------
-  // LOADING STATE
-  // ----------------------------
-  if (loading) {
-    return (
-      <Layout>
-        <div className="pt-40 text-center text-white">Loading product...</div>
-      </Layout>
-    );
-  }
-
-  if (!product) {
-    return (
-      <Layout>
-        <div className="pt-40 text-center text-white">Product not found</div>
-      </Layout>
-    );
-  }
-
-  // ----------------------------
-  // ADD TO CART (përmes CartContext)
-  // ----------------------------
   const addToCart = () => {
-    // shto produktin 'quantity' herë në shportën globale
     for (let i = 0; i < quantity; i++) {
-      addToCartCtx(product as IProduct);
+      addToCartCtx(product as unknown as IProduct);
     }
     setAdded(true);
     setTimeout(() => setAdded(false), 2000);
@@ -186,42 +140,88 @@ const ProductDetails: NextPage = () => {
             </div>
 
             {/* RELATED PRODUCTS */}
-            <div>
-              <h2 className="text-[#ececec] text-lg font-semibold mb-6">
-                Related products
-              </h2>
+            {related.length > 0 && (
+              <div>
+                <h2 className="text-[#ececec] text-lg font-semibold mb-6">
+                  Related products
+                </h2>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                {related.map((item) => (
-                  <Link
-                    key={item._id}
-                    href={`/shop/${item._id}`}
-                    className="text-center"
-                  >
-                    <div className="bg-white aspect-square mb-4 overflow-hidden">
-                      <img
-                        src={item.image}
-                        alt={item.title}
-                        loading="lazy"
-                        decoding="async"
-                        className="w-full h-full object-cover"
-                      />
-                    </div>
-
-                    <h3 className="text-[#ececec] text-sm font-semibold mb-2">
-                      {item.title}
-                    </h3>
-
-                    <p className="text-[#ececec] text-sm">${item.price}</p>
-                  </Link>
-                ))}
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                  {related.map((item) => (
+                    <Card key={item._id} product={item} />
+                  ))}
+                </div>
               </div>
-            </div>
+            )}
           </div>
         </section>
       </Layout>
     </>
   );
+};
+
+// Rrugët dinamike - getStaticPaths
+export const getStaticPaths: GetStaticPaths = async () => {
+  let paths: { params: { slug: string } }[] = [];
+  try {
+    if (process.env.MONGODB_URI) {
+      await dbConnect();
+      const docs = await Product.find({}).select("_id").lean();
+      paths = docs.map((d) => ({ params: { slug: d._id.toString() } }));
+    }
+  } catch (error) {
+    console.error("Gabim te getStaticPaths:", error);
+  }
+  // fallback: "blocking" -> produktet e reja gjenerohen sipas kërkesës
+  return { paths, fallback: "blocking" };
+};
+
+export const getStaticProps: GetStaticProps<ProductDetailsProps> = async (
+  ctx,
+) => {
+  const slug = ctx.params?.slug as string;
+
+  if (!slug || !mongoose.Types.ObjectId.isValid(slug)) {
+    return { notFound: true };
+  }
+
+  try {
+    await dbConnect();
+    const doc = await Product.findById(slug).lean();
+    if (!doc) {
+      return { notFound: true };
+    }
+
+    const product: PDProduct = {
+      _id: doc._id.toString(),
+      title: doc.title,
+      description: doc.description,
+      price: doc.price,
+      image: doc.image || "",
+      category: doc.category || "",
+      stock: doc.stock ?? 0,
+    };
+
+    // Related: produkte të të njëjtës kategori (përjashto vetë produktin)
+    const relatedDocs = await Product.find({
+      category: doc.category,
+      _id: { $ne: doc._id },
+    })
+      .limit(4)
+      .lean();
+
+    const related: RelatedProduct[] = relatedDocs.map((r) => ({
+      _id: r._id.toString(),
+      name: r.title,
+      price: r.price,
+      image: r.image || "",
+    }));
+
+    return { props: { product, related }, revalidate: 60 };
+  } catch (error) {
+    console.error("Gabim te getStaticProps (product):", error);
+    return { notFound: true };
+  }
 };
 
 export default ProductDetails;

@@ -47,12 +47,21 @@ export default function Header() {
               Blog
             </Link>
           </li>
+          <li>
+            <Link
+              href="/contact"
+              className="hover:text-paradox-glow transition"
+            >
+              Contact
+            </Link>
+          </li>
         </ul>
 
         {/* Right side */}
         <div className="flex items-center gap-3 sm:gap-5">
           {/* Search */}
-          <button
+          <Link
+            href="/search"
             className="text-white hover:text-paradox-glow transition"
             aria-label="Search"
           >
@@ -69,7 +78,7 @@ export default function Header() {
                 d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
               />
             </svg>
-          </button>
+          </Link>
 
           {/* Account: Login OSE Profile dropdown */}
           {session ? (
@@ -288,6 +297,15 @@ export default function Header() {
                 className="block py-2 hover:text-paradox-glow"
               >
                 Blog
+              </Link>
+            </li>
+            <li>
+              <Link
+                href="/contact"
+                onClick={() => setOpen(false)}
+                className="block py-2 hover:text-paradox-glow"
+              >
+                Contact
               </Link>
             </li>
             <li className="pt-2 border-t border-paradox-purple/20">

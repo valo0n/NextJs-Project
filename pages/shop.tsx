@@ -5,6 +5,7 @@ import Head from "next/head";
 import Link from "next/link";
 import { GetStaticProps, NextPage } from "next";
 import { useUserProducts } from "@/context/UserProductsContext";
+import Card from "@/components/Card";
 import { dbConnect } from "@/lib/dbConnect";
 import Product from "@/models/Product";
 
@@ -147,31 +148,7 @@ const Shop: NextPage<ShopProps> = ({ products, categories }) => {
                 ) : (
                   <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-8">
                     {products.map((product) => (
-                      <div key={product._id} className="group text-center">
-                        <Link href={`/shop/${product._id}`}>
-                          <div className="bg-white aspect-square overflow-hidden mb-4 flex items-center justify-center">
-                            <img
-                              loading="lazy"
-                              decoding="async"
-                              src={product.image}
-                              alt={product.name}
-                              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                            />
-                          </div>
-
-                          <h3 className="text-[#ececec] text-sm font-semibold leading-snug mb-2">
-                            {product.name}
-                          </h3>
-
-                          <div className="flex justify-center gap-1 mb-2 text-yellow-400 text-xs">
-                            ★★★★★
-                          </div>
-
-                          <p className="text-[#ececec] text-sm">
-                            ${product.price.toFixed(2)}
-                          </p>
-                        </Link>
-                      </div>
+                      <Card key={product._id} product={product} />
                     ))}
                   </div>
                 )}
