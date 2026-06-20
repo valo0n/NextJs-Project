@@ -120,11 +120,20 @@ export default function Header() {
                       </li>
                       <li>
                         <Link
-                          href="/profile"
+                          href="/profile?tab=products"
                           onClick={() => setUserMenuOpen(false)}
                           className="block px-4 py-2 text-sm text-white hover:bg-white/10 transition"
                         >
                           📦 Produktet e mia
+                        </Link>
+                      </li>
+                      <li>
+                        <Link
+                          href="/profile?tab=orders"
+                          onClick={() => setUserMenuOpen(false)}
+                          className="block px-4 py-2 text-sm text-white hover:bg-white/10 transition"
+                        >
+                          🧾 Porositë e mia
                         </Link>
                       </li>
                       {session.user?.role === "admin" && (

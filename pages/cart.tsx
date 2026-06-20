@@ -12,9 +12,17 @@ const Cart: NextPage = () => {
   const { cart, removeFromCart, clearCart, total } = useCart();
   const router = useRouter();
 
-  // Kthimi nga Stripe: pastro shportën pas suksesit
+  // Kthimi nga Stripe: konfirmo porosinë (paid) dhe pastro shportën
   useEffect(() => {
     if (router.query.success === "true") {
+      const sid = router.query.session_id;
+      if (typeof sid === "string") {
+        fetch("/api/orders/confirm", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ sessionId: sid }),
+        }).catch(() => {});
+      }
       clearCart();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps

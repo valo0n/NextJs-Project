@@ -28,11 +28,29 @@ interface DBProduct {
   createdAt: string;
 }
 
+interface MyOrder {
+  _id: string;
+  items: { title: string; qty: number; price: number }[];
+  total: number;
+  status: string;
+  createdAt: string;
+}
+
+const ORDER_STATUS_MAP: Record<string, { label: string; cls: string }> = {
+  pending: { label: "Në pritje", cls: "bg-gray-500/20 text-gray-300" },
+  paid: { label: "Paguar", cls: "bg-blue-500/20 text-blue-300" },
+  shipped: { label: "Dërguar", cls: "bg-purple-500/20 text-purple-300" },
+  delivered: { label: "Dorëzuar", cls: "bg-green-500/20 text-green-300" },
+  cancelled: { label: "Anuluar", cls: "bg-red-500/20 text-red-300" },
+};
+
 const Profile: NextPage = () => {
   const { data: session, status } = useSession();
   const router = useRouter();
 
-  const [activeTab, setActiveTab] = useState<"info" | "products">("info");
+  const [activeTab, setActiveTab] = useState<
+    "info" | "products" | "orders" | "security"
+  >("info");
   const [showAddForm, setShowAddForm] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [imageFile, setImageFile] = useState<File | null>(null);
@@ -43,6 +61,73 @@ const Profile: NextPage = () => {
   const [products, setProducts] = useState<DBProduct[]>([]);
   const [loadingProducts, setLoadingProducts] = useState(true);
 
+  // Porositë e mia
+  const [myOrders, setMyOrders] = useState<MyOrder[]>([]);
+  const [loadingOrders, setLoadingOrders] = useState(false);
+
+  // Ndryshimi i fjalëkalimit
+  const [curPw, setCurPw] = useState("");
+  const [newPw, setNewPw] = useState("");
+  const [pwSaving, setPwSaving] = useState(false);
+
+  useEffect(() => {
+    if (activeTab !== "orders") return;
+
+    let active = true;
+    const load = (initial = false) => {
+      if (initial) setLoadingOrders(true);
+      fetch("/api/orders/mine")
+        .then((r) => r.json())
+        .then((d) => {
+          if (active) setMyOrders(Array.isArray(d) ? d : []);
+        })
+        .catch(() => {})
+        .finally(() => {
+          if (active && initial) setLoadingOrders(false);
+        });
+    };
+
+    load(true); // ngarkim i parë (me loading)
+    const interval = setInterval(() => load(false), 5000); // rifresko çdo 5s
+
+    return () => {
+      active = false;
+      clearInterval(interval);
+    };
+  }, [activeTab]);
+
+  useEffect(() => {
+    const t = router.query.tab;
+    const role = session?.user?.role;
+    const canProducts = role === "seller" || role === "admin";
+    if (t === "orders" || t === "security" || t === "info") {
+      setActiveTab(t);
+    } else if (t === "products" && canProducts) {
+      setActiveTab("products");
+    }
+  }, [router.query.tab, session]);
+
+  const handleChangePassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setPwSaving(true);
+    try {
+      const res = await fetch("/api/user/change-password", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ currentPassword: curPw, newPassword: newPw }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.message);
+      toast.success(data.message || "Fjalëkalimi u ndryshua");
+      setCurPw("");
+      setNewPw("");
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Gabim");
+    } finally {
+      setPwSaving(false);
+    }
+  };
+
   const {
     register,
     handleSubmit,
@@ -51,21 +136,12 @@ const Profile: NextPage = () => {
     formState: { errors },
   } = useForm<ProductFormData>();
 
-  // Auth guard - vetem seller dhe admin
+  // Auth guard - çdo përdorues i kyçur ka qasje në profil
   useEffect(() => {
     if (status === "unauthenticated") {
       router.push("/login");
-      return;
     }
-    if (
-      status === "authenticated" &&
-      session?.user?.role !== "seller" &&
-      session?.user?.role !== "admin"
-    ) {
-      toast.error("Vetëm shitësit kanë qasje në Profile");
-      router.push("/");
-    }
-  }, [status, session, router]);
+  }, [status, router]);
 
   // Merr produktet nga MongoDB
   const fetchProducts = useCallback(async () => {
@@ -101,6 +177,9 @@ const Profile: NextPage = () => {
   }
 
   if (!session) return null;
+
+  const isSeller =
+    session.user?.role === "seller" || session.user?.role === "admin";
 
   // Upload image
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -304,16 +383,56 @@ const Profile: NextPage = () => {
                   />
                 )}
               </button>
+              {isSeller && (
+                <button
+                  onClick={() => setActiveTab("products")}
+                  className={`px-4 sm:px-6 py-3 font-semibold transition relative ${
+                    activeTab === "products"
+                      ? "text-white"
+                      : "text-gray-400 hover:text-gray-200"
+                  }`}
+                >
+                  Produktet e mia ({products.length})
+                  {activeTab === "products" && (
+                    <div
+                      className="absolute bottom-[-1px] left-0 right-0 h-[3px]"
+                      style={{
+                        background:
+                          "linear-gradient(65deg, rgb(63, 50, 220) 0%, rgb(207, 53, 210) 100%)",
+                      }}
+                    />
+                  )}
+                </button>
+              )}
               <button
-                onClick={() => setActiveTab("products")}
+                onClick={() => setActiveTab("orders")}
                 className={`px-4 sm:px-6 py-3 font-semibold transition relative ${
-                  activeTab === "products"
+                  activeTab === "orders"
                     ? "text-white"
                     : "text-gray-400 hover:text-gray-200"
                 }`}
               >
-                Produktet e mia ({products.length})
-                {activeTab === "products" && (
+                Porositë e mia
+                {activeTab === "orders" && (
+                  <div
+                    className="absolute bottom-[-1px] left-0 right-0 h-[3px]"
+                    style={{
+                      background:
+                        "linear-gradient(65deg, rgb(63, 50, 220) 0%, rgb(207, 53, 210) 100%)",
+                    }}
+                  />
+                )}
+              </button>
+              <button
+                onClick={() => setActiveTab("security")}
+                className={`px-4 sm:px-6 py-3 font-semibold transition relative ${
+                  activeTab === "security"
+                    ? "text-white"
+                    : "text-gray-400 hover:text-gray-200"
+                }`}
+              >
+                Siguria
+                {activeTab === "security" && (
                   <div
                     className="absolute bottom-[-1px] left-0 right-0 h-[3px]"
                     style={{
@@ -324,6 +443,97 @@ const Profile: NextPage = () => {
                 )}
               </button>
             </div>
+
+            {/* TAB: ORDERS */}
+            {activeTab === "orders" && (
+              <div>
+                {loadingOrders ? (
+                  <p className="text-gray-400">Duke u ngarkuar...</p>
+                ) : myOrders.length === 0 ? (
+                  <p className="text-gray-400">S&apos;ke ende porosi.</p>
+                ) : (
+                  <div className="space-y-4">
+                    {myOrders.map((o) => {
+                      const st =
+                        ORDER_STATUS_MAP[o.status] || ORDER_STATUS_MAP.pending;
+                      return (
+                        <div
+                          key={o._id}
+                          className="border border-white/10 rounded-lg p-5 bg-paradox-bg/40"
+                        >
+                          <div className="flex justify-between items-start mb-3">
+                            <div>
+                              <p className="text-xs text-gray-500 font-mono">
+                                #{o._id.slice(-6)}
+                              </p>
+                              <p className="text-xs text-gray-400">
+                                {new Date(o.createdAt).toLocaleDateString("sq")}
+                              </p>
+                            </div>
+                            <span
+                              className={`text-xs px-3 py-1 rounded-full ${st.cls}`}
+                            >
+                              {st.label}
+                            </span>
+                          </div>
+                          <div className="text-sm text-gray-300 space-y-1">
+                            {o.items.map((it, i) => (
+                              <div key={i}>
+                                {it.title}{" "}
+                                <span className="text-gray-500">
+                                  × {it.qty}
+                                </span>
+                              </div>
+                            ))}
+                          </div>
+                          <p className="text-right font-semibold mt-3">
+                            Totali: ${o.total.toFixed(2)}
+                          </p>
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* TAB: SECURITY */}
+            {activeTab === "security" && (
+              <div className="max-w-md">
+                <div className="border border-white/10 rounded-lg p-6 bg-paradox-bg/40">
+                  <h2 className="text-xl font-bold mb-4">
+                    Ndrysho fjalëkalimin
+                  </h2>
+                  <form onSubmit={handleChangePassword} className="space-y-4">
+                    <input
+                      type="password"
+                      placeholder="Fjalëkalimi aktual"
+                      value={curPw}
+                      onChange={(e) => setCurPw(e.target.value)}
+                      className="w-full bg-white/5 border border-white/10 text-white px-4 py-2 rounded-lg focus:outline-none focus:border-[#cf35d2] placeholder:text-gray-500"
+                    />
+                    <input
+                      type="password"
+                      placeholder="Fjalëkalimi i ri (min 6 karaktere)"
+                      value={newPw}
+                      onChange={(e) => setNewPw(e.target.value)}
+                      className="w-full bg-white/5 border border-white/10 text-white px-4 py-2 rounded-lg focus:outline-none focus:border-[#cf35d2] placeholder:text-gray-500"
+                    />
+                    <button
+                      type="submit"
+                      disabled={pwSaving}
+                      className="px-6 py-2 rounded-lg text-white font-semibold transition disabled:opacity-60"
+                      style={{
+                        background:
+                          "linear-gradient(65deg, rgb(63, 50, 220) 0%, rgb(207, 53, 210) 100%)",
+                      }}
+                    >
+                      {pwSaving ? "Duke ruajtur..." : "Ruaj fjalëkalimin"}
+                    </button>
+                  </form>
+                </div>
+              </div>
+            )}
 
             {/* TAB: INFO */}
             {activeTab === "info" && (

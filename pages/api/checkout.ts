@@ -1,8 +1,11 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import Stripe from "stripe";
 import mongoose from "mongoose";
+import { getServerSession } from "next-auth/next";
+import { authOptions } from "@/pages/api/auth/[...nextauth]";
 import { dbConnect } from "@/lib/dbConnect";
 import Product from "@/models/Product";
+import Order, { IOrderItem } from "@/models/Order";
 
 export default async function handler(
   req: NextApiRequest,
@@ -40,9 +43,13 @@ export default async function handler(
     const products = await Product.find({ _id: { $in: validIds } }).lean();
 
     const line_items: Stripe.Checkout.SessionCreateParams.LineItem[] = [];
+    const orderItems: IOrderItem[] = [];
+    let total = 0;
     for (const item of items) {
       const p = products.find((pp) => pp._id.toString() === item._id);
       if (!p) continue;
+
+      const qty = item.qty > 0 ? item.qty : 1;
 
       line_items.push({
         price_data: {
@@ -55,8 +62,17 @@ export default async function handler(
           },
           unit_amount: Math.round(p.price * 100), // ne cent
         },
-        quantity: item.qty > 0 ? item.qty : 1,
+        quantity: qty,
       });
+
+      orderItems.push({
+        productId: p._id.toString(),
+        title: p.title,
+        price: p.price,
+        qty,
+        image: p.image,
+      });
+      total += p.price * qty;
     }
 
     if (line_items.length === 0) {
@@ -74,6 +90,18 @@ export default async function handler(
       mode: "payment",
       line_items,
       return_url: `${origin}/cart?success=true&session_id={CHECKOUT_SESSION_ID}`,
+    });
+
+    // Ruaj porosinë si "pending" - statusi kalon në "paid" pas konfirmimit
+    const session2 = await getServerSession(req, res, authOptions);
+    const userId = (session2?.user as { id?: string })?.id || null;
+
+    await Order.create({
+      userId,
+      items: orderItems,
+      total,
+      status: "pending",
+      stripeSessionId: session.id,
     });
 
     return res.status(200).json({ clientSecret: session.client_secret });

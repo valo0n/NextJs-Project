@@ -7,7 +7,7 @@ import Link from "next/link";
 import toast from "react-hot-toast";
 import { FIGMA } from "@/lib/figmaAssets";
 
-type Tab = "overview" | "users" | "products" | "settings";
+type Tab = "overview" | "users" | "products" | "orders" | "settings";
 
 interface DBUser {
   _id: string;
@@ -40,6 +40,15 @@ interface Stats {
   recentProducts: DBProduct[];
 }
 
+interface OrderRow {
+  _id: string;
+  items: { title: string; price: number; qty: number; image?: string }[];
+  total: number;
+  status: string;
+  email?: string;
+  createdAt: string;
+}
+
 const Dashboard: NextPage = () => {
   const { data: session, status } = useSession();
   const router = useRouter();
@@ -70,6 +79,7 @@ const Dashboard: NextPage = () => {
     { id: "overview", label: "Përmbledhje", icon: "📊" },
     { id: "users", label: "Përdoruesit", icon: "👥" },
     { id: "products", label: "Produktet", icon: "📦" },
+    { id: "orders", label: "Porositë", icon: "🧾" },
     { id: "settings", label: "Settings", icon: "⚙️" },
   ];
 
@@ -207,6 +217,7 @@ const Dashboard: NextPage = () => {
             {activeTab === "overview" && <OverviewTab />}
             {activeTab === "users" && <UsersTab />}
             {activeTab === "products" && <ProductsTab />}
+            {activeTab === "orders" && <OrdersTab />}
             {activeTab === "settings" && <SettingsTab />}
           </div>
         </main>
@@ -710,6 +721,130 @@ function Toggle({
           className={`absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full transition-transform ${checked ? "translate-x-6" : ""}`}
         />
       </button>
+    </div>
+  );
+}
+
+// ============= ORDERS TAB — MongoDB =============
+const ORDER_STATUSES = [
+  { value: "pending", label: "⏳ Në pritje", color: "text-gray-300" },
+  { value: "paid", label: "💳 Paguar", color: "text-blue-300" },
+  { value: "shipped", label: "🚚 Dërguar", color: "text-purple-300" },
+  { value: "delivered", label: "✅ Dorëzuar", color: "text-green-300" },
+  { value: "cancelled", label: "❌ Anuluar", color: "text-red-300" },
+];
+
+function OrdersTab() {
+  const [orders, setOrders] = useState<OrderRow[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  const fetchOrders = useCallback(() => {
+    setLoading(true);
+    fetch("/api/orders")
+      .then((res) => res.json())
+      .then((data) => {
+        setOrders(Array.isArray(data) ? data : []);
+        setLoading(false);
+      })
+      .catch(() => {
+        toast.error("Gabim");
+        setLoading(false);
+      });
+  }, []);
+
+  useEffect(() => {
+    fetchOrders();
+  }, [fetchOrders]);
+
+  const handleStatusChange = async (order: OrderRow, status: string) => {
+    try {
+      const res = await fetch(`/api/orders/${order._id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ status }),
+      });
+      if (!res.ok) throw new Error();
+      toast.success(`Porosia → ${status}`);
+      fetchOrders();
+    } catch {
+      toast.error("Gabim");
+    }
+  };
+
+  if (loading) return <p className="text-gray-400">Duke u ngarkuar...</p>;
+
+  return (
+    <div className="space-y-6">
+      <h2 className="text-xl font-bold">Porositë ({orders.length})</h2>
+
+      {orders.length === 0 ? (
+        <p className="text-gray-400">S'ka ende porosi.</p>
+      ) : (
+        <div className="border border-white/10 rounded-2xl overflow-hidden bg-paradox-bg/40">
+          <div className="overflow-x-auto">
+            <table className="w-full">
+              <thead>
+                <tr className="border-b border-white/10 text-left text-sm text-gray-400">
+                  <th className="px-6 py-4 font-medium">Porosia</th>
+                  <th className="px-6 py-4 font-medium">Produktet</th>
+                  <th className="px-6 py-4 font-medium">Totali</th>
+                  <th className="px-6 py-4 font-medium">Email</th>
+                  <th className="px-6 py-4 font-medium">Data</th>
+                  <th className="px-6 py-4 font-medium">Statusi</th>
+                </tr>
+              </thead>
+              <tbody>
+                {orders.map((order) => (
+                  <tr
+                    key={order._id}
+                    className="border-b border-white/5 hover:bg-white/5 transition align-top"
+                  >
+                    <td className="px-6 py-4 text-xs text-gray-400 font-mono">
+                      #{order._id.slice(-6)}
+                    </td>
+                    <td className="px-6 py-4 text-sm">
+                      {order.items.map((it, i) => (
+                        <div key={i} className="text-gray-300">
+                          {it.title}{" "}
+                          <span className="text-gray-500">× {it.qty}</span>
+                        </div>
+                      ))}
+                    </td>
+                    <td className="px-6 py-4 font-semibold">
+                      ${order.total.toFixed(2)}
+                    </td>
+                    <td className="px-6 py-4 text-gray-400 text-sm">
+                      {order.email || "—"}
+                    </td>
+                    <td className="px-6 py-4 text-gray-400 text-sm">
+                      {new Date(order.createdAt).toLocaleDateString("sq")}
+                    </td>
+                    <td className="px-6 py-4">
+                      <select
+                        value={order.status}
+                        onChange={(e) =>
+                          handleStatusChange(order, e.target.value)
+                        }
+                        className="bg-white/5 border border-white/10 text-white text-xs px-2 py-1 rounded focus:outline-none focus:border-[#cf35d2]"
+                      >
+                        {ORDER_STATUSES.map((s) => (
+                          <option
+                            key={s.value}
+                            value={s.value}
+                            className="bg-paradox-bg"
+                          >
+                            {s.label}
+                          </option>
+                        ))}
+                      </select>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
