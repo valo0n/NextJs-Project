@@ -202,6 +202,7 @@ const About: NextPage<AboutProps> = ({ lastPosts }) => {
               {lastPosts.length === 0 ? (
                 <p className="text-gray-400 col-span-full">
                   S'ka ende poste blogu.{" "}
+                  {/* eslint-disable-next-line @next/next/no-html-link-for-pages */}
                   <a
                     href="/api/blog/seed"
                     className="text-paradox-purple underline"

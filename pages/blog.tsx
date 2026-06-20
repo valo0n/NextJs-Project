@@ -55,6 +55,7 @@ const Blog: NextPage<BlogProps> = ({ posts, categories, recent }) => {
                     <p className="text-gray-400 mb-4">
                       S'ka ende poste blogu në databazë.
                     </p>
+                    {/* eslint-disable-next-line @next/next/no-html-link-for-pages */}
                     <a
                       href="/api/blog/seed"
                       className="text-paradox-purple underline"

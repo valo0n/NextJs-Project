@@ -47,7 +47,7 @@ export default async function handler(
       maxFileSize: 5 * 1024 * 1024, // 5MB max
     });
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    // eslint-disable-next-line
     form.parse(req, (err: any, _fields: any, files: any) => {
       if (err) {
         res

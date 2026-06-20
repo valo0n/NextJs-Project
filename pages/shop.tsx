@@ -138,6 +138,7 @@ const Shop: NextPage<ShopProps> = ({ products, categories }) => {
                     <p className="text-gray-400 mb-4">
                       S'ka produkte në databazë.
                     </p>
+                    {/* eslint-disable-next-line @next/next/no-html-link-for-pages */}
                     <a
                       href="/api/seed"
                       className="text-paradox-purple underline"
