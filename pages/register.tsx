@@ -4,7 +4,9 @@ import { useState } from "react";
 import Link from "next/link";
 import Head from "next/head";
 import toast from "react-hot-toast";
-import { NextPage } from "next";
+import { GetServerSideProps, NextPage } from "next";
+import { getServerSession } from "next-auth/next";
+import { authOptions } from "@/pages/api/auth/[...nextauth]";
 import { FIGMA } from "@/lib/figmaAssets";
 
 interface RegisterFormData {
@@ -403,6 +405,15 @@ const Register: NextPage = () => {
       </div>
     </>
   );
+};
+
+// Nëse je tashmë i kyçur, ridrejto në Home (s'lejohet të hapësh /register)
+export const getServerSideProps: GetServerSideProps = async (ctx) => {
+  const session = await getServerSession(ctx.req, ctx.res, authOptions);
+  if (session) {
+    return { redirect: { destination: "/", permanent: false } };
+  }
+  return { props: {} };
 };
 
 export default Register;

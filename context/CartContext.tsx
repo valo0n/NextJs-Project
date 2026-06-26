@@ -1,4 +1,10 @@
-import { createContext, useContext, useState, useEffect, ReactNode } from "react";
+import {
+  createContext,
+  useContext,
+  useState,
+  useEffect,
+  ReactNode,
+} from "react";
 import { IProduct } from "@/types";
 
 interface CartItem extends IProduct {
@@ -21,26 +27,31 @@ interface CartProviderProps {
 
 export function CartProvider({ children }: CartProviderProps) {
   const [cart, setCart] = useState<CartItem[]>([]);
+  const [hydrated, setHydrated] = useState(false);
 
+  // Ngarko shportën nga localStorage NJË herë
   useEffect(() => {
-    if (typeof window !== "undefined") {
+    try {
       const stored = localStorage.getItem("cart");
       if (stored) setCart(JSON.parse(stored));
+    } catch {
+      // injoro JSON të prishur
     }
+    setHydrated(true);
   }, []);
 
+  // Ruaj VETËM pasi është ngarkuar (që mos ta fshijë me [] në mount)
   useEffect(() => {
-    if (typeof window !== "undefined") {
-      localStorage.setItem("cart", JSON.stringify(cart));
-    }
-  }, [cart]);
+    if (!hydrated) return;
+    localStorage.setItem("cart", JSON.stringify(cart));
+  }, [cart, hydrated]);
 
   const addToCart = (product: IProduct) => {
     setCart((prev) => {
       const exists = prev.find((p) => p._id === product._id);
       if (exists) {
         return prev.map((p) =>
-          p._id === product._id ? { ...p, qty: p.qty + 1 } : p
+          p._id === product._id ? { ...p, qty: p.qty + 1 } : p,
         );
       }
       return [...prev, { ...product, qty: 1 }];
@@ -56,7 +67,9 @@ export function CartProvider({ children }: CartProviderProps) {
   const total = cart.reduce((sum, p) => sum + p.price * p.qty, 0);
 
   return (
-    <CartContext.Provider value={{ cart, addToCart, removeFromCart, clearCart, total }}>
+    <CartContext.Provider
+      value={{ cart, addToCart, removeFromCart, clearCart, total }}
+    >
       {children}
     </CartContext.Provider>
   );

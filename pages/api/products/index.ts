@@ -37,11 +37,9 @@ export default async function handler(
       return res.status(401).json({ message: "Pa autorizim" });
     }
     if (session.user.role !== "seller" && session.user.role !== "admin") {
-      return res
-        .status(403)
-        .json({
-          message: "Vetëm shitësit dhe adminët mund të shtojnë produkte",
-        });
+      return res.status(403).json({
+        message: "Vetëm shitësit dhe adminët mund të shtojnë produkte",
+      });
     }
 
     try {

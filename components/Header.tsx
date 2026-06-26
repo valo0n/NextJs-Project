@@ -7,8 +7,9 @@ import { FIGMA } from "@/lib/figmaAssets";
 export default function Header() {
   const [open, setOpen] = useState<boolean>(false);
   const [userMenuOpen, setUserMenuOpen] = useState<boolean>(false);
+  const [cartMenuOpen, setCartMenuOpen] = useState<boolean>(false);
   const { data: session } = useSession();
-  const { cart } = useCart();
+  const { cart, removeFromCart, total } = useCart();
   const cartCount = cart.reduce((sum, item) => sum + item.qty, 0);
 
   return (
@@ -127,15 +128,18 @@ export default function Header() {
                           👤 Profili Im
                         </Link>
                       </li>
-                      <li>
-                        <Link
-                          href="/profile?tab=products"
-                          onClick={() => setUserMenuOpen(false)}
-                          className="block px-4 py-2 text-sm text-white hover:bg-white/10 transition"
-                        >
-                          📦 Produktet e mia
-                        </Link>
-                      </li>
+                      {(session.user?.role === "seller" ||
+                        session.user?.role === "admin") && (
+                        <li>
+                          <Link
+                            href="/profile?tab=products"
+                            onClick={() => setUserMenuOpen(false)}
+                            className="block px-4 py-2 text-sm text-white hover:bg-white/10 transition"
+                          >
+                            📦 Produktet e mia
+                          </Link>
+                        </li>
+                      )}
                       <li>
                         <Link
                           href="/profile?tab=orders"
@@ -196,36 +200,120 @@ export default function Header() {
           )}
 
           {/* Cart */}
-          <Link
-            href="/cart"
-            className="relative text-white hover:text-paradox-glow transition"
-            aria-label="Cart"
-          >
-            <svg
-              className="w-5 h-5 sm:w-6 sm:h-6"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
+          <div className="relative">
+            <button
+              onClick={() => {
+                setCartMenuOpen(!cartMenuOpen);
+                setUserMenuOpen(false);
+              }}
+              className="relative text-white hover:text-paradox-glow transition"
+              aria-label="Cart"
             >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"
-              />
-            </svg>
-            {cartCount > 0 && (
-              <span
-                className="absolute -top-2 -right-2 min-w-[18px] h-[18px] px-1 flex items-center justify-center rounded-full text-[10px] font-bold text-white"
-                style={{
-                  background:
-                    "linear-gradient(65deg, rgb(63, 50, 220) 0%, rgb(207, 53, 210) 100%)",
-                }}
+              <svg
+                className="w-5 h-5 sm:w-6 sm:h-6"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
               >
-                {cartCount}
-              </span>
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"
+                />
+              </svg>
+              {cartCount > 0 && (
+                <span
+                  className="absolute -top-2 -right-2 min-w-[18px] h-[18px] px-1 flex items-center justify-center rounded-full text-[10px] font-bold text-white"
+                  style={{
+                    background:
+                      "linear-gradient(65deg, rgb(63, 50, 220) 0%, rgb(207, 53, 210) 100%)",
+                  }}
+                >
+                  {cartCount}
+                </span>
+              )}
+            </button>
+
+            {cartMenuOpen && (
+              <div className="absolute right-0 mt-3 w-80 bg-paradox-bg border border-white/10 rounded-xl shadow-2xl overflow-hidden z-50">
+                <div className="px-4 py-3 border-b border-white/10">
+                  <p className="text-white font-semibold text-sm">
+                    Shporta ({cartCount})
+                  </p>
+                </div>
+
+                {cart.length === 0 ? (
+                  <div className="px-4 py-8 text-center text-gray-400 text-sm">
+                    Shporta është bosh
+                  </div>
+                ) : (
+                  <>
+                    <ul className="max-h-72 overflow-y-auto">
+                      {cart.map((item) => (
+                        <li
+                          key={item._id}
+                          className="flex items-center gap-3 px-4 py-3 border-b border-white/5"
+                        >
+                          <img
+                            src={item.image}
+                            alt={item.title}
+                            loading="lazy"
+                            className="w-12 h-12 object-cover rounded bg-white/10 flex-shrink-0"
+                          />
+                          <div className="flex-1 min-w-0">
+                            <p className="text-white text-sm truncate">
+                              {item.title}
+                            </p>
+                            <p className="text-gray-400 text-xs">
+                              {item.qty} × ${item.price.toFixed(2)}
+                            </p>
+                          </div>
+                          <button
+                            onClick={() => removeFromCart(item._id)}
+                            aria-label="Hiq"
+                            className="text-gray-500 hover:text-red-400 text-lg leading-none"
+                          >
+                            ×
+                          </button>
+                        </li>
+                      ))}
+                    </ul>
+
+                    <div className="px-4 py-3 border-b border-white/10 flex justify-between text-sm">
+                      <span className="text-gray-400">Totali</span>
+                      <span className="text-white font-bold">
+                        ${total.toFixed(2)}
+                      </span>
+                    </div>
+                  </>
+                )}
+
+                <div className="p-3 flex flex-col gap-2">
+                  <Link
+                    href="/cart"
+                    onClick={() => setCartMenuOpen(false)}
+                    className="block text-center py-2 rounded-lg border border-white/20 text-white text-sm hover:bg-white/10 transition"
+                  >
+                    Shiko shportën
+                  </Link>
+                  {cart.length > 0 && (
+                    <Link
+                      href="/checkout"
+                      onClick={() => setCartMenuOpen(false)}
+                      className="block text-center py-2 rounded-lg text-white text-sm font-semibold transition"
+                      style={{
+                        background:
+                          "linear-gradient(65deg, rgb(63, 50, 220) 0%, rgb(207, 53, 210) 100%)",
+                      }}
+                    >
+                      Vazhdo te pagesa
+                    </Link>
+                  )}
+                </div>
+              </div>
             )}
-          </Link>
+          </div>
 
           {/* Mobile menu toggle */}
           <button

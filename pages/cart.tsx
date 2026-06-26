@@ -15,12 +15,12 @@ const Cart: NextPage = () => {
   // Kthimi nga Stripe: konfirmo porosinë (paid) dhe pastro shportën
   useEffect(() => {
     if (router.query.success === "true") {
-      const sid = router.query.session_id;
-      if (typeof sid === "string") {
+      const pid = router.query.payment_intent;
+      if (typeof pid === "string") {
         fetch("/api/orders/confirm", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ sessionId: sid }),
+          body: JSON.stringify({ paymentIntentId: pid }),
         }).catch(() => {});
       }
       clearCart();

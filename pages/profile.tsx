@@ -358,7 +358,9 @@ const Profile: NextPage = () => {
                 </span>
               </h1>
               <p className="text-gray-400">
-                Menaxho profilin dhe produktet e tua për shitje
+                {isSeller
+                  ? "Menaxho profilin dhe produktet e tua për shitje"
+                  : "Menaxho profilin dhe porositë e tua"}
               </p>
             </div>
 
@@ -576,26 +578,34 @@ const Profile: NextPage = () => {
 
                 {/* Stats */}
                 <div className="lg:col-span-2 grid grid-cols-1 sm:grid-cols-3 gap-4">
-                  <div className="border border-white/10 rounded-2xl p-6 bg-paradox-bg/40 backdrop-blur-sm">
-                    <p className="text-gray-400 text-sm mb-2">
-                      Produkte aktive
-                    </p>
-                    <p className="text-3xl font-bold text-paradox-glow">
-                      {products.length}
-                    </p>
-                  </div>
-                  <div className="border border-white/10 rounded-2xl p-6 bg-paradox-bg/40 backdrop-blur-sm">
-                    <p className="text-gray-400 text-sm mb-2">Vlera totale</p>
-                    <p className="text-3xl font-bold text-paradox-glow">
-                      ${totalValue.toFixed(2)}
-                    </p>
-                  </div>
-                  <div className="border border-white/10 rounded-2xl p-6 bg-paradox-bg/40 backdrop-blur-sm">
-                    <p className="text-gray-400 text-sm mb-2">Stock total</p>
-                    <p className="text-3xl font-bold text-paradox-glow">
-                      {totalStock}
-                    </p>
-                  </div>
+                  {isSeller && (
+                    <>
+                      <div className="border border-white/10 rounded-2xl p-6 bg-paradox-bg/40 backdrop-blur-sm">
+                        <p className="text-gray-400 text-sm mb-2">
+                          Produkte aktive
+                        </p>
+                        <p className="text-3xl font-bold text-paradox-glow">
+                          {products.length}
+                        </p>
+                      </div>
+                      <div className="border border-white/10 rounded-2xl p-6 bg-paradox-bg/40 backdrop-blur-sm">
+                        <p className="text-gray-400 text-sm mb-2">
+                          Vlera totale
+                        </p>
+                        <p className="text-3xl font-bold text-paradox-glow">
+                          ${totalValue.toFixed(2)}
+                        </p>
+                      </div>
+                      <div className="border border-white/10 rounded-2xl p-6 bg-paradox-bg/40 backdrop-blur-sm">
+                        <p className="text-gray-400 text-sm mb-2">
+                          Stock total
+                        </p>
+                        <p className="text-3xl font-bold text-paradox-glow">
+                          {totalStock}
+                        </p>
+                      </div>
+                    </>
+                  )}
 
                   {/* Quick actions */}
                   <div className="sm:col-span-3 border border-white/10 rounded-2xl p-6 bg-paradox-bg/40 backdrop-blur-sm">
@@ -603,19 +613,21 @@ const Profile: NextPage = () => {
                       Veprime të shpejta
                     </h3>
                     <div className="flex flex-wrap gap-3">
-                      <button
-                        onClick={() => {
-                          setActiveTab("products");
-                          setShowAddForm(true);
-                        }}
-                        className="px-6 py-3 rounded-lg text-white font-semibold transition-all hover:shadow-[0_0_20px_rgba(207,53,210,0.4)]"
-                        style={{
-                          background:
-                            "linear-gradient(65deg, rgb(63, 50, 220) 0%, rgb(207, 53, 210) 100%)",
-                        }}
-                      >
-                        + Shto produkt të ri
-                      </button>
+                      {isSeller && (
+                        <button
+                          onClick={() => {
+                            setActiveTab("products");
+                            setShowAddForm(true);
+                          }}
+                          className="px-6 py-3 rounded-lg text-white font-semibold transition-all hover:shadow-[0_0_20px_rgba(207,53,210,0.4)]"
+                          style={{
+                            background:
+                              "linear-gradient(65deg, rgb(63, 50, 220) 0%, rgb(207, 53, 210) 100%)",
+                          }}
+                        >
+                          + Shto produkt të ri
+                        </button>
+                      )}
                       <Link
                         href="/shop"
                         className="px-6 py-3 rounded-lg text-white font-semibold border border-white/20 hover:bg-white/5 transition"

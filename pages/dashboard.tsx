@@ -738,23 +738,22 @@ function OrdersTab() {
   const [orders, setOrders] = useState<OrderRow[]>([]);
   const [loading, setLoading] = useState(true);
 
-  const fetchOrders = useCallback(() => {
-    setLoading(true);
+  const load = useCallback((initial = false) => {
+    if (initial) setLoading(true);
     fetch("/api/orders")
       .then((res) => res.json())
-      .then((data) => {
-        setOrders(Array.isArray(data) ? data : []);
-        setLoading(false);
-      })
-      .catch(() => {
-        toast.error("Gabim");
-        setLoading(false);
+      .then((data) => setOrders(Array.isArray(data) ? data : []))
+      .catch(() => {})
+      .finally(() => {
+        if (initial) setLoading(false);
       });
   }, []);
 
   useEffect(() => {
-    fetchOrders();
-  }, [fetchOrders]);
+    load(true); // ngarkimi i parë (me loading)
+    const interval = setInterval(() => load(false), 5000); // live çdo 5s
+    return () => clearInterval(interval);
+  }, [load]);
 
   const handleStatusChange = async (order: OrderRow, status: string) => {
     try {
@@ -765,7 +764,7 @@ function OrdersTab() {
       });
       if (!res.ok) throw new Error();
       toast.success(`Porosia → ${status}`);
-      fetchOrders();
+      load();
     } catch {
       toast.error("Gabim");
     }

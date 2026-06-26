@@ -16,29 +16,32 @@ export default async function handler(
     return res.status(500).json({ message: "Mungon STRIPE_SECRET_KEY" });
   }
 
-  const { sessionId } = req.body as { sessionId?: string };
-  if (!sessionId) {
-    return res.status(400).json({ message: "Mungon sessionId" });
+  const { paymentIntentId, email } = req.body as {
+    paymentIntentId?: string;
+    email?: string;
+  };
+  if (!paymentIntentId) {
+    return res.status(400).json({ message: "Mungon paymentIntentId" });
   }
 
   try {
     const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
-    const session = await stripe.checkout.sessions.retrieve(sessionId);
+    const pi = await stripe.paymentIntents.retrieve(paymentIntentId);
 
     await dbConnect();
-    const order = await Order.findOne({ stripeSessionId: sessionId });
+    const order = await Order.findOne({ stripeSessionId: paymentIntentId });
     if (!order) {
       return res.status(404).json({ message: "Porosia s'u gjet" });
     }
 
     // Verifiko te Stripe që pagesa u krye vërtet
-    if (session.payment_status === "paid") {
-      // mos e ul statusin nëse admini e ka çuar më tej (shipped/delivered)
+    if (pi.status === "succeeded") {
+      // mos e ul statusin nëse admini e ka çuar më tej
       if (order.status === "pending") {
         order.status = "paid";
       }
-      if (session.customer_details?.email) {
-        order.email = session.customer_details.email;
+      if (email) {
+        order.email = email;
       }
       await order.save();
       return res.status(200).json({ status: order.status, paid: true });
@@ -47,11 +50,9 @@ export default async function handler(
     return res.status(200).json({ status: order.status, paid: false });
   } catch (error) {
     console.error("Gabim te confirm:", error);
-    return res
-      .status(500)
-      .json({
-        message: "Gabim te konfirmimi",
-        error: (error as Error).message,
-      });
+    return res.status(500).json({
+      message: "Gabim te konfirmimi",
+      error: (error as Error).message,
+    });
   }
 }

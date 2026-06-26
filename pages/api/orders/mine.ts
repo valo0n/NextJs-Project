@@ -22,6 +22,20 @@ export default async function handler(
 
   await dbConnect();
 
+  // DIAGNOSTIKË E PËRKOHSHME: /api/orders/mine?debug=1
+  if (req.query.debug) {
+    const all = await Order.find({})
+      .select("_id userId email status total")
+      .sort({ createdAt: -1 })
+      .limit(10)
+      .lean();
+    return res.status(200).json({
+      sessionUserId: userId,
+      sessionEmail: email,
+      orders: all,
+    });
+  }
+
   // Lidh porositë me userId OSE me email-in e llogarisë (fallback)
   const orMatch: Record<string, unknown>[] = [{ userId }];
   if (email) orMatch.push({ email });
