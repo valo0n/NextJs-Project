@@ -21,8 +21,18 @@ export default async function handler(
     });
   }
 
-  const randomId = Math.random().toString(36).substring(2, 15);
-  const imageUrl = `https://picsum.photos/400/300?random=${randomId}`;
+  // Static placeholder images (nuk ndërrohen me refresh)
+  const placeholders = [
+    "https://via.placeholder.com/400x300/6B46C1/FFFFFF?text=Product+1",
+    "https://via.placeholder.com/400x300/EC4899/FFFFFF?text=Product+2",
+    "https://via.placeholder.com/400x300/F59E0B/FFFFFF?text=Product+3",
+    "https://via.placeholder.com/400x300/10B981/FFFFFF?text=Product+4",
+    "https://via.placeholder.com/400x300/3B82F6/FFFFFF?text=Product+5",
+  ];
+
+  // Zgjidh placeholder-in bazuar në timestamp (i njëjtë për të njëjtën sekondë)
+  const timeBasedIndex = Math.floor(Date.now() / 1000) % placeholders.length;
+  const imageUrl = placeholders[timeBasedIndex];
 
   res.status(200).json({ url: imageUrl });
 }
